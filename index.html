@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khan-Style Interactive Practice</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Header / Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="showTopicSelection()">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">
+          <i data-lucide="brain"></i>
+        </div>
+        <span class="font-extrabold text-xl tracking-tight text-slate-900">EduPractice</span>
+      </div>
+
+      <div class="flex items-center space-x-6 text-sm font-medium">
+        <div class="flex items-center space-x-1.5 text-amber-500 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
+          <i data-lucide="flame" class="w-4 h-4 fill-amber-500"></i>
+          <span id="streak-count" class="font-bold">3</span>
+          <span class="text-amber-700 text-xs hidden sm:inline">day streak</span>
+        </div>
+        <div class="flex items-center space-x-1.5 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+          <i data-lucide="zap" class="w-4 h-4 fill-emerald-500"></i>
+          <span id="score-xp" class="font-bold">120</span>
+          <span class="text-emerald-700 text-xs hidden sm:inline">XP</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 my-4">
+
+    <!-- VIEW 1: Topic Selection Dashboard -->
+    <div id="view-dashboard" class="space-y-6">
+      <div class="text-center sm:text-left space-y-1">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Select a Topic to Practice</h1>
+        <p class="text-slate-500">Master interactive questions with instant feedback and step-by-step hints.</p>
+      </div>
+
+      <div id="topics-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <!-- Topic cards dynamically injected here via JS -->
+      </div>
+    </div>
+
+    <!-- VIEW 2: Quiz Practice Mode -->
+    <div id="view-quiz" class="hidden space-y-6">
+      
+      <!-- Top Utility Bar -->
+      <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <button onclick="showTopicSelection()" class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-1.5 transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Back to Topics
+        </button>
+
+        <!-- Topic Title Badge -->
+        <span id="current-topic-title" class="font-semibold text-slate-700 text-sm bg-slate-100 px-3 py-1 rounded-full">
+          Math
+        </span>
+
+        <!-- Scratchpad Toggle Button -->
+        <button id="toggle-scratchpad" onclick="toggleScratchpad()" class="text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 text-sm font-medium flex items-center gap-1.5 transition">
+          <i data-lucide="pen-tool" class="w-4 h-4"></i>
+          Scratchpad
+        </button>
+      </div>
+
+      <!-- Question Card Container -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative">
+        
+        <!-- Scratchpad Canvas Drawer (Hidden by default) -->
+        <div id="scratchpad-drawer" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col p-4 border-b border-slate-200">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scratchpad Drawer</span>
+            <div class="flex items-center gap-2">
+              <button onclick="clearScratchpad()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-600 transition">Clear Canvas</button>
+              <button onclick="toggleScratchpad()" class="text-xs bg-slate-800 text-white px-2.5 py-1 rounded hover:bg-slate-700 transition">Close</button>
+            </div>
+          </div>
+          <canvas id="scratchpad-canvas" class="flex-1 border border-slate-200 rounded-lg cursor-crosshair bg-white"></canvas>
+        </div>
+
+        <!-- Question Header & Text -->
+        <div class="p-6 sm:p-8 space-y-4">
+          <div class="flex justify-between items-center text-xs text-slate-400 font-semibold tracking-wide uppercase">
+            <span id="question-tracker">Question 1 of 5</span>
+            <span id="question-difficulty" class="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Beginner</span>
+          </div>
+
+          <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug">
+            Question prompt loading...
+          </h2>
+
+          <div id="code-snippet-container" class="hidden">
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm font-mono overflow-x-auto"><code id="code-snippet"></code></pre>
+          </div>
+        </div>
+
+        <!-- Multiple Choice Options -->
+        <div class="px-6 sm:px-8 pb-6">
+          <div id="options-container" class="space-y-3">
+            <!-- Dynamic MCQ Choices injected here -->
+          </div>
+        </div>
+
+        <!-- Feedback & Next Controls Bar -->
+        <div id="action-bar" class="bg-slate-50 border-t border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <button id="hint-btn" onclick="revealHint()" class="w-full sm:w-auto text-indigo-600 hover:text-indigo-700 text-sm font-semibold flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="lightbulb" class="w-4 h-4"></i>
+            Stuck? Get a hint (<span id="hints-remaining">0</span> left)
+          </button>
+
+          <button id="submit-btn" onclick="checkAnswer()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed">
+            Check Answer
+          </button>
+        </div>
+
+        <!-- Instant Feedback Box -->
+        <div id="feedback-box" class="hidden p-6 border-t">
+          <!-- Dynamically populated with Success or Error feedback -->
+        </div>
+
+        <!-- Hints List Box -->
+        <div id="hints-box" class="hidden border-t border-amber-100 bg-amber-50/60 p-6 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+            <i data-lucide="help-circle" class="w-4 h-4"></i>
+            Hints
+          </h4>
+          <div id="hints-list" class="space-y-2 text-sm text-amber-900">
+            <!-- Revealed hints populate here -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // App State Variables
+    let quizData = { topics: [] };
+    let currentTopic = null;
+    let currentQuestionIndex = 0;
+    let selectedOption = null;
+    let hintsRevealed = 0;
+    let userXP = 120;
+    let userStreak = 3;
+
+    // Scratchpad variables
+    let canvas, ctx, isDrawing = false;
+
+    // Load external questions JSON on load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('questions.json')
+        .then(response => {
+          if (!response.ok) throw new Error("Could not load questions.json");
+          return response.json();
+        })
+        .then(data => {
+          quizData = data;
+          renderTopicCards();
+          lucide.createIcons();
+        })
+        .catch(err => {
+          console.error("Error loading quiz questions:", err);
+          document.getElementById('topics-grid').innerHTML = `
+            <div class="col-span-2 p-6 bg-red-50 text-red-700 border border-red-200 rounded-xl text-center">
+              <p class="font-bold">Failed to load questions.json</p>
+              <p class="text-xs mt-1">Make sure 'questions.json' exists in the same directory as index.html.</p>
+            </div>`;
+        });
+
+      initScratchpad();
+    });
+
+    // Render topics on dashboard
+    function renderTopicCards() {
+      const grid = document.getElementById('topics-grid');
+      grid.innerHTML = '';
+
+      quizData.topics.forEach((topic) => {
+        const card = document.createElement('div');
+        card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group";
+        card.onclick = () => startTopicQuiz(topic.id);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">
+                <i data-lucide="${topic.icon || 'book-open'}" class="w-6 h-6"></i>
+              </span>
+              <span class="text-xs font-semibold text-slate-400">${topic.questions.length} questions</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">${topic.title}</h3>
+            <p class="text-sm text-slate-500 mb-4">${topic.description}</p>
+          </div>
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs font-semibold text-indigo-600">
+            <span>Start Practice</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function showTopicSelection() {
+      document.getElementById('view-quiz').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+    }
+
+    function startTopicQuiz(topicId) {
+      currentTopic = quizData.topics.find(t => t.id === topicId);
+      currentQuestionIndex = 0;
+      if (!currentTopic || !currentTopic.questions.length) return;
+
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-quiz').classList.remove('hidden');
+      document.getElementById('current-topic-title').innerText = currentTopic.title;
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = currentTopic.questions[currentQuestionIndex];
+      selectedOption = null;
+      hintsRevealed = 0;
+
+      // Reset DOM Elements
+      document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} of ${currentTopic.questions.length}`;
+      document.getElementById('question-difficulty').innerText = q.difficulty || 'Standard';
+      document.getElementById('question-text').innerText = q.question;
+
+      // Code Snippet Check
+      const codeContainer = document.getElementById('code-snippet-container');
+      if (q.codeSnippet) {
+        document.getElementById('code-snippet').innerText = q.codeSnippet;
+        codeContainer.classList.remove('hidden');
+      } else {
+        codeContainer.classList.add('hidden');
+      }
+
+      // Options
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition font-medium text-slate-700 flex items-center justify-between option-btn";
+        btn.onclick = () => selectOption(idx, btn);
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 option-badge">${String.fromCharCode(65 + idx)}</span>
+            <span>${optText}</span>
+          </div>
+        `;
+        optionsContainer.appendChild(btn);
+      });
+
+      // Reset Action Bar & Hint Boxes
+      document.getElementById('hints-remaining').innerText = q.hints ? q.hints.length : 0;
+      document.getElementById('hint-btn').disabled = !q.hints || q.hints.length === 0;
+      document.getElementById('hints-box').classList.add('hidden');
+      document.getElementById('hints-list').innerHTML = '';
+
+      const feedbackBox = document.getElementById('feedback-box');
+      feedbackBox.className = "hidden p-6 border-t";
+      feedbackBox.innerHTML = '';
+
+      document.getElementById('action-bar').classList.remove('hidden');
+      document.getElementById('submit-btn').disabled = true;
+
+      lucide.createIcons();
+    }
+
+    function selectOption(index, btnElement) {
+      selectedOption = index;
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('border-indigo-600', 'bg-indigo-50/50', 'ring-2', 'ring-indigo-600/20');
+        b.classList.add('border-slate-200');
+      });
+      btnElement.classList.remove('border-slate-200');
+      btnElement.classList.add('border-indigo-600', 'bg-indigo-50/50', 'ring-2', 'ring-indigo-600/20');
+      
+      document.getElementById('submit-btn').disabled = false;
+    }
+
+    function revealHint() {
+      const q = currentTopic.questions[currentQuestionIndex];
+      if (!q.hints || hintsRevealed >= q.hints.length) return;
+
+      const hintsBox = document.getElementById('hints-box');
+      const hintsList = document.getElementById('hints-list');
+      hintsBox.classList.remove('hidden');
+
+      const hintText = q.hints[hintsRevealed];
+      hintsRevealed++;
+
+      const hintElem = document.createElement('div');
+      hintElem.className = "p-3 bg-white/80 rounded-lg border border-amber-200 text-amber-900";
+      hintElem.innerHTML = `<strong>Hint ${hintsRevealed}:</strong> ${hintText}`;
+      hintsList.appendChild(hintElem);
+
+      document.getElementById('hints-remaining').innerText = q.hints.length - hintsRevealed;
+      if (hintsRevealed >= q.hints.length) {
+        document.getElementById('hint-btn').disabled = true;
+      }
+    }
+
+    function checkAnswer() {
+      if (selectedOption === null) return;
+
+      const q = currentTopic.questions[currentQuestionIndex];
+      const isCorrect = selectedOption === q.correctAnswer;
+      const feedbackBox = document.getElementById('feedback-box');
+
+      document.getElementById('action-bar').classList.add('hidden');
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        userXP += 10;
+        document.getElementById('score-xp').innerText = userXP;
+        
+        // Trigger celebration confetti
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 60, spread: 60, origin: { y: 0.8 } });
+        }
+
+        feedbackBox.className = "p-6 border-t border-emerald-200 bg-emerald-50 rounded-b-2xl space-y-4";
+        feedbackBox.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="p-2 bg-emerald-500 text-white rounded-full"><i data-lucide="check" class="w-5 h-5"></i></div>
+            <div>
+              <h3 class="text-lg font-bold text-emerald-900">Nice work! That's correct.</h3>
+              <p class="text-sm text-emerald-700 mt-1">${q.explanation || 'Great job answering this problem.'}</p>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button onclick="nextQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+              Next Question <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      } else {
+        feedbackBox.className = "p-6 border-t border-rose-200 bg-rose-50 rounded-b-2xl space-y-4";
+        feedbackBox.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="p-2 bg-rose-500 text-white rounded-full"><i data-lucide="x" class="w-5 h-5"></i></div>
+            <div>
+              <h3 class="text-lg font-bold text-rose-900">Not quite yet</h3>
+              <p class="text-sm text-rose-700 mt-1">${q.explanation || 'Review the hints or try again next time.'}</p>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button onclick="loadQuestion()" class="bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-5 py-2.5 rounded-xl font-bold transition">
+              Try Again
+            </button>
+            <button onclick="nextQuestion()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+              Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < currentTopic.questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+      } else {
+        // Topic Complete State
+        document.getElementById('view-quiz').classList.add('hidden');
+        document.getElementById('view-dashboard').classList.remove('hidden');
+        alert("🎉 Topic Complete! Great practice session.");
+      }
+    }
+
+    // Scratchpad canvas logic
+    function initScratchpad() {
+      canvas = document.getElementById('scratchpad-canvas');
+      ctx = canvas.getContext('2d');
+
+      const resize = () => {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight - 40;
+      };
+      window.addEventListener('resize', resize);
+      setTimeout(resize, 100);
+
+      const start = (e) => { isDrawing = true; draw(e); };
+      const stop = () => { isDrawing = false; ctx.beginPath(); };
+      const draw = (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#4f46e5';
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      };
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mouseup', stop);
+      canvas.addEventListener('mousemove', draw);
+
+      canvas.addEventListener('touchstart', start);
+      canvas.addEventListener('touchend', stop);
+      canvas.addEventListener('touchmove', draw);
+    }
+
+    function toggleScratchpad() {
+      const drawer = document.getElementById('scratchpad-drawer');
+      drawer.classList.toggle('hidden');
+      if (!drawer.classList.contains('hidden')) {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight - 40;
+      }
+    }
+
+    function clearScratchpad() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  </script>
+</body>
+</html>
