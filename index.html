@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduPractice | Interactive Quiz & Learning</title>
+  <title>EduPractice | Interactive Practice Platform</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,219 +14,212 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Google Fonts (Inter) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Firebase Web SDK v9 (Modular via CDN scripts) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut, 
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      increment 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // IMPORTANT: Replace this configuration with your actual Firebase project credentials
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Make Firebase services accessible globally to the app script
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.fbMethods = {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      increment
+    };
+  </script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
+    /* Custom CSS for nested subtopic flyout menu on hover */
+    .has-submenu:hover .submenu {
+      display: block;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
-  <!-- Header / Navigation -->
-<header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-    
-    <!-- Logo / Home Link -->
-    <div class="flex items-center space-x-6">
-      <a href="#" onclick="showTopicSelection(); return false;" class="flex items-center space-x-3 text-slate-900 font-extrabold text-xl">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
-          <i data-lucide="brain"></i>
-        </div>
-        <span class="hidden sm:inline">EduPractice</span>
-      </a>
+  <!-- ==================== HEADER / NAVIGATION ==================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      
+      <!-- Left: Logo & Navigation Menu -->
+      <div class="flex items-center space-x-6">
+        <a href="#" onclick="showTopicSelection(); return false;" class="flex items-center space-x-3 text-slate-900 font-extrabold text-xl">
+          <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-sm">
+            <i data-lucide="brain"></i>
+          </div>
+          <span class="hidden sm:inline tracking-tight">EduPractice</span>
+        </a>
 
-      <!-- Navigation Dropdown -->
-      <nav class="flex items-center space-x-4">
-        <button onclick="showTopicSelection()" class="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition">
-          Home
-        </button>
-
-        <!-- Dropdown Container -->
-        <div class="relative group">
-          <button class="flex items-center space-x-1 text-sm font-semibold text-slate-600 hover:text-indigo-600 py-2 transition">
-            <span>Topics</span>
-            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        <!-- Navigation Dropdown -->
+        <nav class="flex items-center space-x-4">
+          <button onclick="showTopicSelection()" class="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition">
+            Home
           </button>
 
-          <!-- Dropdown Options (Dynamically Populated) -->
-          <div id="dropdown-topics-menu" class="absolute left-0 top-full w-52 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 p-2 z-50">
-            <!-- JavaScript will insert topic links here -->
+          <!-- Topics Dropdown Container -->
+          <div class="relative group">
+            <button class="flex items-center space-x-1 text-sm font-semibold text-slate-600 hover:text-indigo-600 py-2 transition">
+              <span>Topics</span>
+              <i data-lucide="chevron-down" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Dropdown Menu Box -->
+            <div id="dropdown-topics-menu" class="absolute left-0 top-full w-60 bg-white border border-slate-200 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 p-2 z-50">
+              <!-- Dynamically populated via JS -->
+            </div>
           </div>
-        </div>
-      </nav>
-    </div>
-
-    <!-- User XP / Auth Stats -->
-    <div id="user-stats-bar" class="flex items-center space-x-4">
-      <!-- Profile & XP counters here -->
-    </div>
-
-  </div>
-</header>
-
-  <!-- Main Application Body -->
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 my-2 sm:my-4">
-
-    <!-- VIEW 1: Authentication View (Sign In / Sign Up) -->
-    <div id="view-auth" class="hidden max-w-md mx-auto space-y-6 pt-4">
-      <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-lg space-y-6">
-        <div class="text-center space-y-2">
-          <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl mx-auto flex items-center justify-center font-bold text-2xl">
-            <i data-lucide="lock"></i>
-          </div>
-          <h2 id="auth-title" class="text-2xl font-extrabold text-slate-900">Welcome Back</h2>
-          <p id="auth-subtitle" class="text-sm text-slate-500">Sign in to save your progress, streaks, and XP.</p>
-        </div>
-
-        <!-- Alert Banner -->
-        <div id="auth-error-banner" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium"></div>
-
-        <!-- Form -->
-        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
-          <div id="field-name" class="hidden space-y-1">
-            <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Display Name</label>
-            <input type="text" id="input-name" placeholder="Alex Johnson" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition text-sm">
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Email Address</label>
-            <input type="email" id="input-email" required placeholder="alex@example.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition text-sm">
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Password</label>
-            <input type="password" id="input-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition text-sm">
-          </div>
-
-          <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md shadow-indigo-200 text-sm">
-            Sign In
-          </button>
-        </form>
-
-        <div class="relative flex py-2 items-center">
-          <div class="flex-grow border-t border-slate-200"></div>
-          <span class="flex-shrink mx-4 text-xs font-bold text-slate-400 uppercase">Or</span>
-          <div class="flex-grow border-t border-slate-200"></div>
-        </div>
-
-        <!-- Anonymous / Guest Button -->
-        <button onclick="handleAnonymousSignIn()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
-          <i data-lucide="user-check" class="w-4 h-4"></i>
-          Continue as Guest
-        </button>
-
-        <!-- Toggle Auth Mode -->
-        <div class="text-center pt-2">
-          <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-            Need an account? Sign Up
-          </button>
-        </div>
+        </nav>
       </div>
-    </div>
 
-    <!-- VIEW 2: User Profile Modal / View -->
-    <div id="view-profile" class="hidden space-y-6">
-      <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+      <!-- Right: User Stats Bar & Auth Button -->
+      <div class="flex items-center space-x-4">
         
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div class="flex items-center space-x-4">
-            <div id="profile-avatar" class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-white font-extrabold text-2xl shadow-md">
-              ?
-            </div>
-            <div>
-              <h2 id="profile-display-name" class="text-2xl font-bold text-slate-900">User Profile</h2>
-              <p id="profile-email" class="text-sm text-slate-400">user@example.com</p>
-            </div>
+        <!-- User Stats (Visible when logged in or guest practice) -->
+        <div class="flex items-center space-x-3 text-sm font-medium">
+          <div class="flex items-center space-x-1.5 text-amber-500 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
+            <i data-lucide="flame" class="w-4 h-4 fill-amber-500"></i>
+            <span id="streak-count" class="font-bold">0</span>
           </div>
-          <button onclick="handleSignOut()" class="text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-          </button>
-        </div>
-
-        <!-- User Stats Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl text-center">
-            <span class="block text-2xl font-black text-emerald-600" id="profile-stat-xp">0</span>
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800">Total XP</span>
-          </div>
-          <div class="p-4 bg-amber-50/50 border border-amber-100 rounded-2xl text-center">
-            <span class="block text-2xl font-black text-amber-600" id="profile-stat-streak">0</span>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Day Streak</span>
-          </div>
-          <div class="p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl text-center col-span-2 sm:col-span-1">
-            <span class="block text-2xl font-black text-indigo-600" id="profile-stat-completed">0</span>
-            <span class="text-xs font-bold uppercase tracking-wider text-indigo-800">Solved Questions</span>
+          <div class="flex items-center space-x-1.5 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+            <i data-lucide="zap" class="w-4 h-4 fill-emerald-500"></i>
+            <span id="score-xp" class="font-bold">0</span>
+            <span class="text-emerald-700 text-xs hidden sm:inline">XP</span>
           </div>
         </div>
 
-        <div class="pt-4 flex justify-end">
-          <button onclick="showView('view-dashboard')" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm">
-            Back to Dashboard
-          </button>
+        <!-- Auth Button State (Logged Out: Sign In / Sign Up | Logged In: Profile Menu) -->
+        <div id="auth-header-container">
+          <!-- Logged Out View -->
+          <div id="logged-out-view" class="flex items-center gap-2">
+            <button onclick="openAuthModal('signin')" class="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 rounded-xl transition">
+              Sign In
+            </button>
+            <button onclick="openAuthModal('signup')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-sm transition">
+              Sign Up
+            </button>
+          </div>
+
+          <!-- Logged In View -->
+          <div id="logged-in-view" class="hidden relative group">
+            <button class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 p-1.5 pr-3 rounded-full transition">
+              <div id="user-avatar" class="w-7 h-7 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-xs">
+                U
+              </div>
+              <span id="user-display-name" class="text-xs font-semibold text-slate-700 max-w-[100px] truncate">User</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-500"></i>
+            </button>
+
+            <!-- User Menu Dropdown -->
+            <div class="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 z-50">
+              <div class="px-3 py-2 border-b border-slate-100 text-xs text-slate-500 truncate" id="user-email-label">user@example.com</div>
+              <button onclick="handleSignOut()" class="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition flex items-center gap-2 mt-1">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                Sign Out
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
     </div>
+  </header>
 
-    <!-- VIEW 3: Dashboard (Topic Selection) -->
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 my-4">
+
+    <!-- VIEW 1: Dashboard / Topic Selection -->
     <div id="view-dashboard" class="space-y-6">
       <div class="text-center sm:text-left space-y-1">
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Select a Topic to Practice</h1>
-        <p class="text-slate-500">Master interactive questions with instant feedback and step-by-step hints.</p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Interactive Practice Dashboard</h1>
+        <p class="text-slate-500">Choose a topic or subtopic to begin answering practice questions.</p>
       </div>
 
       <div id="topics-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        <!-- Topic cards dynamically injected here -->
+        <!-- Dynamically populated topic cards -->
       </div>
     </div>
 
-    <!-- VIEW 4: Quiz Practice Mode -->
+    <!-- VIEW 2: Interactive Quiz View -->
     <div id="view-quiz" class="hidden space-y-6">
       
-      <!-- Top Utility Bar -->
-      <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <button onclick="showView('view-dashboard')" class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-1.5 transition">
+      <!-- Quiz Nav Bar -->
+      <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <button onclick="showTopicSelection()" class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-1.5 transition">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
-          Back to Topics
+          Back to Dashboard
         </button>
 
-        <span id="current-topic-title" class="font-semibold text-slate-700 text-xs sm:text-sm bg-slate-100 px-3 py-1 rounded-full">
-          Math
+        <span id="current-topic-title" class="font-semibold text-slate-700 text-sm bg-slate-100 px-3 py-1 rounded-full">
+          Topic
         </span>
 
-        <button id="toggle-scratchpad" onclick="toggleScratchpad()" class="text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition">
+        <button onclick="toggleScratchpad()" class="text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 text-sm font-medium flex items-center gap-1.5 transition">
           <i data-lucide="pen-tool" class="w-4 h-4"></i>
           Scratchpad
         </button>
       </div>
 
-      <!-- Question Card Container -->
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden relative">
+      <!-- Question Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative">
         
         <!-- Scratchpad Canvas Drawer -->
         <div id="scratchpad-drawer" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col p-4 border-b border-slate-200">
           <div class="flex justify-between items-center mb-2">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scratchpad Drawer</span>
             <div class="flex items-center gap-2">
-              <button onclick="clearScratchpad()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-600 transition">Clear</button>
+              <button onclick="clearScratchpad()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-600 transition">Clear Canvas</button>
               <button onclick="toggleScratchpad()" class="text-xs bg-slate-800 text-white px-2.5 py-1 rounded hover:bg-slate-700 transition">Close</button>
             </div>
           </div>
-          <canvas id="scratchpad-canvas" class="flex-1 border border-slate-200 rounded-xl cursor-crosshair bg-white"></canvas>
+          <canvas id="scratchpad-canvas" class="flex-1 border border-slate-200 rounded-lg cursor-crosshair bg-white"></canvas>
         </div>
 
-        <!-- Question Header & Text -->
+        <!-- Question Box -->
         <div class="p-6 sm:p-8 space-y-4">
           <div class="flex justify-between items-center text-xs text-slate-400 font-semibold tracking-wide uppercase">
             <span id="question-tracker">Question 1 of 5</span>
-            <span id="question-difficulty" class="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Beginner</span>
+            <span id="question-difficulty" class="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Standard</span>
           </div>
 
           <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug">
@@ -238,30 +231,31 @@
           </div>
         </div>
 
-        <!-- Options List -->
+        <!-- MCQ Options -->
         <div class="px-6 sm:px-8 pb-6">
-          <div id="options-container" class="space-y-3"></div>
+          <div id="options-container" class="space-y-3">
+            <!-- Dynamic choices -->
+          </div>
         </div>
 
-        <!-- Action Bar -->
+        <!-- Action Controls Bar -->
         <div id="action-bar" class="bg-slate-50 border-t border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <button id="hint-btn" onclick="revealHint()" class="w-full sm:w-auto text-indigo-600 hover:text-indigo-700 text-sm font-semibold flex items-center justify-center gap-1.5 transition">
             <i data-lucide="lightbulb" class="w-4 h-4"></i>
             Stuck? Get a hint (<span id="hints-remaining">0</span> left)
           </button>
 
-          <button id="submit-btn" onclick="checkAnswer()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed">
+          <button id="submit-btn" onclick="checkAnswer()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-md transition disabled:opacity-50">
             Check Answer
           </button>
         </div>
 
-        <!-- Instant Feedback Box -->
+        <!-- Feedback & Hints Container -->
         <div id="feedback-box" class="hidden p-6 border-t"></div>
-
-        <!-- Hints Box -->
         <div id="hints-box" class="hidden border-t border-amber-100 bg-amber-50/60 p-6 space-y-3">
           <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
-            <i data-lucide="help-circle" class="w-4 h-4"></i> Hints
+            <i data-lucide="help-circle" class="w-4 h-4"></i>
+            Hints
           </h4>
           <div id="hints-list" class="space-y-2 text-sm text-amber-900"></div>
         </div>
@@ -271,381 +265,264 @@
 
   </main>
 
-  <!-- Firebase SDK Modules -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-      getAuth, 
-      signInWithCustomToken, 
-      signInAnonymously, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      signOut, 
-      onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      updateDoc, 
-      onSnapshot 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Application ID and Config context
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'quiz-app-default';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' 
-      ? JSON.parse(__firebase_config) 
-      : {
-          apiKey: "demo-key",
-          authDomain: "demo.firebaseapp.com",
-          projectId: "demo-project",
-          storageBucket: "demo.appspot.com",
-          messagingSenderId: "123456789",
-          appId: "1:123456789:web:demo"
-        };
+  <!-- ==================== AUTHENTICATION MODAL ==================== -->
+  <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative border border-slate-100">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      <div class="text-center space-y-1 mb-6">
+        <h3 id="auth-modal-title" class="text-xl font-bold text-slate-900">Sign In to EduPractice</h3>
+        <p id="auth-modal-subtitle" class="text-xs text-slate-500">Save your practice XP, track streaks, and view progress.</p>
+      </div>
 
-    // Global App State
-    window.appState = {
-      user: null,
-      userData: {
-        xp: 0,
-        streak: 0,
-        completedQuestions: []
-      },
-      authMode: 'signin', // 'signin' or 'signup'
-      isGuest: false
-    };
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Address</label>
+          <input type="email" id="auth-email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
+        </div>
 
-    // Authenticate user session
-    async function initAuth() {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (err) {
-        console.warn("Auth initialization fallback:", err);
-      }
-    }
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+          <input type="password" id="auth-password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
+        </div>
 
-    // Monitor Auth State
-    onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        window.appState.user = currentUser;
-        window.appState.isGuest = currentUser.isAnonymous;
-        
-        // Listen to Firestore User Document (Private Collection Path - Rule 1)
-        const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
-        
-        onSnapshot(userDocRef, (snapshot) => {
-          if (snapshot.exists()) {
-            window.appState.userData = snapshot.data();
-          } else {
-            // Initialize user doc if missing
-            const initialData = {
-              xp: 0,
-              streak: 1,
-              completedQuestions: [],
-              displayName: currentUser.displayName || (currentUser.isAnonymous ? 'Guest Student' : 'Student'),
-              email: currentUser.email || 'guest@edu.local'
-            };
-            setDoc(userDocRef, initialData);
-            window.appState.userData = initialData;
-          }
-          updateUIState();
-        }, (error) => {
-          console.error("Firestore user doc error:", error);
-        });
+        <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md">
+          Sign In
+        </button>
+      </form>
 
-      } else {
-        window.appState.user = null;
-        window.appState.userData = { xp: 0, streak: 0, completedQuestions: [] };
-        updateUIState();
-      }
-    });
+      <div class="my-4 flex items-center justify-between text-xs text-slate-400">
+        <span class="h-px bg-slate-200 flex-1"></span>
+        <span class="px-3">or</span>
+        <span class="h-px bg-slate-200 flex-1"></span>
+      </div>
 
-    // Save Progress to Firestore
-    window.saveUserProgress = async function(xpAdded, questionId) {
-      if (!window.appState.user) return;
+      <button onclick="handleGoogleSignIn()" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+        <i data-lucide="chrome" class="w-4 h-4"></i>
+        Continue with Google
+      </button>
 
-      const currentUser = window.appState.user;
-      const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+      <div class="mt-6 text-center text-xs text-slate-500">
+        <span id="auth-toggle-text">Don't have an account?</span>
+        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="font-bold text-indigo-600 hover:underline ml-1">Sign Up</button>
+      </div>
+    </div>
+  </div>
 
-      const currentXP = window.appState.userData.xp || 0;
-      const completed = window.appState.userData.completedQuestions || [];
-      
-      if (!completed.includes(questionId)) {
-        completed.push(questionId);
-      }
 
-      try {
-        await updateDoc(userDocRef, {
-          xp: currentXP + xpAdded,
-          completedQuestions: completed
-        });
-      } catch (err) {
-        // Fallback setDoc
-        await setDoc(userDocRef, {
-          xp: currentXP + xpAdded,
-          completedQuestions: completed,
-          streak: window.appState.userData.streak || 1
-        }, { merge: true });
-      }
-    };
-
-    // Auth Submission Handlers
-    window.handleAuthSubmit = async function(e) {
-      e.preventDefault();
-      const email = document.getElementById('input-email').value;
-      const password = document.getElementById('input-password').value;
-      const errBanner = document.getElementById('auth-error-banner');
-      errBanner.classList.add('hidden');
-
-      try {
-        if (window.appState.authMode === 'signup') {
-          const name = document.getElementById('input-name').value;
-          const res = await createUserWithEmailAndPassword(auth, email, password);
-          // Set user profile initial doc
-          const userDocRef = doc(db, 'artifacts', appId, 'users', res.user.uid, 'profile', 'data');
-          await setDoc(userDocRef, {
-            displayName: name || 'Student',
-            email: email,
-            xp: 0,
-            streak: 1,
-            completedQuestions: []
-          });
-        } else {
-          await signInWithEmailAndPassword(auth, email, password);
-        }
-        showView('view-dashboard');
-      } catch (err) {
-        errBanner.innerText = err.message || "Authentication failed.";
-        errBanner.classList.remove('hidden');
-      }
-    };
-
-    window.handleAnonymousSignIn = async function() {
-      try {
-        await signInAnonymously(auth);
-        showView('view-dashboard');
-      } catch (err) {
-        console.error("Guest Sign-in error:", err);
-      }
-    };
-
-    window.handleSignOut = function() {
-      signOut(auth).then(() => {
-        showView('view-dashboard');
-      });
-    };
-
-    initAuth();
-  </script>
-
+  <!-- ==================== APPLICATION SCRIPT ==================== -->
   <script>
-    // Quiz Local Data fallback (or fetch from questions.json)
-    let quizData = {
-      topics: [
-        {
-          id: "math-101",
-          title: "Algebra Foundations",
-          description: "Master linear equations, variables, and order of operations.",
-          icon: "calculator",
-          questions: [
-            {
-              id: "q1",
-              difficulty: "Easy",
-              question: "Solve for x in the equation: 3x - 5 = 16",
-              options: ["x = 5", "x = 7", "x = 8", "x = 21"],
-              correctAnswer: 1,
-              explanation: "Add 5 to both sides: 3x = 21. Then divide both sides by 3 to get x = 7.",
-              hints: ["Start by isolating the x term. Add 5 to both sides.", "3x = 21", "Now divide 21 by 3."]
-            },
-            {
-              id: "q2",
-              difficulty: "Medium",
-              question: "What is the slope of the line passing through points (2, 4) and (4, 10)?",
-              options: ["2", "3", "4", "6"],
-              correctAnswer: 1,
-              explanation: "Slope m = (10 - 4) / (4 - 2) = 6 / 2 = 3.",
-              hints: ["Use formula: m = (y2 - y1) / (x2 - x1)", "y2 - y1 = 10 - 4 = 6", "x2 - x1 = 4 - 2 = 2"]
-            }
-          ]
-        },
-        {
-          id: "js-basics",
-          title: "JavaScript Basics",
-          description: "Test your fundamentals on arrays, functions, and objects.",
-          icon: "code-2",
-          questions: [
-            {
-              id: "jq1",
-              difficulty: "Beginner",
-              question: "What will be printed to the console after running this code?",
-              codeSnippet: "const nums = [1, 2, 3];\nnums.push(4);\nconsole.log(nums.length);",
-              options: ["3", "4", "5", "undefined"],
-              correctAnswer: 1,
-              explanation: "The .push() method appends an item, increasing array length from 3 to 4.",
-              hints: [".push() adds an item to the end.", "Count total elements after pushing 4."]
-            }
-          ]
-        }
-      ]
-    };
-
+    // State Management
+    let quizData = { topics: [] };
     let currentTopic = null;
+    let activeQuestions = [];
     let currentQuestionIndex = 0;
     let selectedOption = null;
     let hintsRevealed = 0;
+    let authMode = 'signin'; // 'signin' or 'signup'
 
-    // Scratchpad variables
+    // User Profile Stats
+    let currentUser = null;
+    let userStats = { xp: 0, streak: 0 };
+
+    // Canvas variables
     let canvas, ctx, isDrawing = false;
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Fetch external questions if present
       fetch('questions.json')
         .then(res => res.json())
         .then(data => {
-          if (data && data.topics) quizData = data;
-          renderTopicCards();
+          quizData = data;
+          renderTopicMenuAndCards();
+          handleRoute();
+          lucide.createIcons();
         })
-        .catch(() => {
-          renderTopicCards();
+        .catch(err => {
+          console.error("Failed to load questions.json", err);
         });
 
       initScratchpad();
-      lucide.createIcons();
+      initFirebaseObserver();
     });
 
-    function updateUIState() {
-      const state = window.appState;
-      const data = state.userData || {};
+    // Observe Firebase Auth State
+    function initFirebaseObserver() {
+      const checkFb = setInterval(() => {
+        if (window.firebaseAuth && window.fbMethods) {
+          clearInterval(checkFb);
+          window.fbMethods.onAuthStateChanged(window.firebaseAuth, async (user) => {
+            currentUser = user;
+            if (user) {
+              document.getElementById('logged-out-view').classList.add('hidden');
+              document.getElementById('logged-in-view').classList.remove('hidden');
+              document.getElementById('user-display-name').innerText = user.displayName || user.email.split('@')[0];
+              document.getElementById('user-email-label').innerText = user.email;
+              document.getElementById('user-avatar').innerText = (user.email[0] || 'U').toUpperCase();
 
-      // Nav Stats
-      document.getElementById('nav-xp-count').innerText = data.xp || 0;
-      document.getElementById('nav-streak-count').innerText = data.streak || 1;
+              // Fetch User Firestore Data
+              await fetchUserData(user.uid);
+            } else {
+              document.getElementById('logged-out-view').classList.remove('hidden');
+              document.getElementById('logged-in-view').classList.add('hidden');
+              userStats = { xp: 0, streak: 0 };
+              updateStatsDisplay();
+            }
+          });
+        }
+      }, 200);
+    }
 
-      // Nav User Button
-      const container = document.getElementById('auth-nav-container');
-      if (state.user) {
-        const name = data.displayName || (state.isGuest ? 'Guest' : 'Account');
-        container.innerHTML = `
-          <button onclick="showView('view-profile')" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 transition">
-            <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">
-              ${name.charAt(0).toUpperCase()}
-            </span>
-            <span class="hidden sm:inline">${name}</span>
-          </button>
-        `;
-      } else {
-        container.innerHTML = `
-          <button onclick="showView('view-auth')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl transition shadow-sm">
-            Sign In
-          </button>
-        `;
+    async function fetchUserData(uid) {
+      try {
+        const docRef = window.fbMethods.doc(window.firebaseDb, "users", uid);
+        const docSnap = await window.fbMethods.getDoc(docRef);
+        if (docSnap.exists()) {
+          userStats = docSnap.data();
+        } else {
+          userStats = { xp: 0, streak: 1 };
+          await window.fbMethods.setDoc(docRef, userStats);
+        }
+        updateStatsDisplay();
+      } catch (err) {
+        console.log("Firestore note: Configure credentials to persist cloud stats.", err);
       }
+    }
 
-      // Profile Modal Data
-      if (state.user) {
-        document.getElementById('profile-display-name').innerText = data.displayName || 'Student Profile';
-        document.getElementById('profile-email').innerText = data.email || 'Guest Session';
-        document.getElementById('profile-avatar').innerText = (data.displayName || 'U').charAt(0).toUpperCase();
-        document.getElementById('profile-stat-xp').innerText = data.xp || 0;
-        document.getElementById('profile-stat-streak').innerText = data.streak || 1;
-        document.getElementById('profile-stat-completed').innerText = (data.completedQuestions || []).length;
-      }
+    function updateStatsDisplay() {
+      document.getElementById('score-xp').innerText = userStats.xp || 0;
+      document.getElementById('streak-count').innerText = userStats.streak || 0;
+    }
+
+    // Render Navigation Menu & Dashboard Cards
+    function renderTopicMenuAndCards() {
+      const grid = document.getElementById('topics-grid');
+      const dropdownMenu = document.getElementById('dropdown-topics-menu');
+
+      grid.innerHTML = '';
+      dropdownMenu.innerHTML = '';
+
+      quizData.topics.forEach((topic) => {
+        // 1. Dashboard Card
+        const card = document.createElement('div');
+        card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group";
+        card.onclick = () => navigateToTopic(topic.id);
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">
+                <i data-lucide="${topic.icon || 'book-open'}" class="w-6 h-6"></i>
+              </span>
+              <span class="text-xs font-semibold text-slate-400">${topic.questions ? topic.questions.length : 0} questions</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">${topic.title}</h3>
+            <p class="text-sm text-slate-500 mb-4">${topic.description}</p>
+          </div>
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs font-semibold text-indigo-600">
+            <span>Start Practice</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        `;
+        grid.appendChild(card);
+
+        // 2. Multi-Level Dropdown Navigation
+        const menuItem = document.createElement('div');
+        menuItem.className = "relative group/sub has-submenu";
+
+        if (topic.subtopics && topic.subtopics.length > 0) {
+          // Topic item with subtopics menu
+          menuItem.innerHTML = `
+            <div class="flex items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl font-medium cursor-pointer transition">
+              <span onclick="navigateToTopic('${topic.id}')">${topic.title}</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <!-- Flyout Submenu -->
+            <div class="submenu hidden absolute left-full top-0 ml-1 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
+              <div class="text-[10px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider border-b border-slate-100 mb-1">
+                ${topic.title} Subtopics
+              </div>
+              ${topic.subtopics.map(sub => `
+                <a href="#${sub.id}" onclick="event.preventDefault(); navigateToTopic('${sub.id}');" class="block px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition">
+                  ${sub.title}
+                </a>
+              `).join('')}
+            </div>
+          `;
+        } else {
+          // Standard topic link
+          menuItem.innerHTML = `
+            <a href="#${topic.id}" onclick="event.preventDefault(); navigateToTopic('${topic.id}');" class="block px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl font-medium transition">
+              ${topic.title}
+            </a>
+          `;
+        }
+        dropdownMenu.appendChild(menuItem);
+      });
 
       lucide.createIcons();
     }
 
-    function showView(viewId) {
-      ['view-dashboard', 'view-quiz', 'view-auth', 'view-profile'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
+    // Navigation & Hash Routing
+    function navigateToTopic(targetId) {
+      window.location.hash = targetId;
+      startTopicQuiz(targetId);
+    }
+
+    function showTopicSelection() {
+      history.pushState("", document.title, window.location.pathname + window.location.search);
+      document.getElementById('view-quiz').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+    }
+
+    function handleRoute() {
+      const routeId = window.location.hash.replace('#', '');
+      if (routeId) {
+        startTopicQuiz(routeId);
+      } else {
+        showTopicSelection();
+      }
+    }
+
+    window.addEventListener('hashchange', handleRoute);
+
+    // Quiz Execution Engine
+    function startTopicQuiz(targetId) {
+      activeQuestions = [];
+      let displayTitle = "Practice";
+
+      // Match parent topic or subtopic ID
+      quizData.topics.forEach(t => {
+        if (t.id === targetId) {
+          activeQuestions = t.questions || [];
+          displayTitle = t.title;
+        } else if (t.subtopics) {
+          t.subtopics.forEach(s => {
+            if (s.id === targetId) {
+              activeQuestions = s.questions || [];
+              displayTitle = `${t.title} › ${s.title}`;
+            }
+          });
+        }
       });
-      document.getElementById(viewId).classList.remove('hidden');
-      if (viewId === 'view-dashboard') renderTopicCards();
-    }
 
-    function toggleAuthMode() {
-      const state = window.appState;
-      state.authMode = state.authMode === 'signin' ? 'signup' : 'signin';
-      
-      const isSignUp = state.authMode === 'signup';
-      document.getElementById('auth-title').innerText = isSignUp ? 'Create Account' : 'Welcome Back';
-      document.getElementById('auth-subtitle').innerText = isSignUp ? 'Join to earn XP and save achievements.' : 'Sign in to save your progress, streaks, and XP.';
-      document.getElementById('field-name').classList.toggle('hidden', !isSignUp);
-      document.getElementById('auth-submit-btn').innerText = isSignUp ? 'Sign Up' : 'Sign In';
-      document.getElementById('auth-toggle-btn').innerText = isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up';
-    }
+      if (!activeQuestions.length) return;
 
-    function renderTopicCards() {
-  const grid = document.getElementById('topics-grid');
-  const dropdownMenu = document.getElementById('dropdown-topics-menu');
-
-  grid.innerHTML = '';
-  dropdownMenu.innerHTML = '';
-
-  quizData.topics.forEach((topic) => {
-    // 1. Create Dashboard Card
-    const card = document.createElement('div');
-    card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group";
-    card.onclick = () => navigateToTopic(topic.id);
-    card.innerHTML = `
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <span class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">
-            <i data-lucide="${topic.icon || 'book-open'}" class="w-6 h-6"></i>
-          </span>
-          <span class="text-xs font-semibold text-slate-400">${topic.questions.length} questions</span>
-        </div>
-        <h3 class="text-lg font-bold text-slate-900 mb-1">${topic.title}</h3>
-        <p class="text-sm text-slate-500 mb-4">${topic.description}</p>
-      </div>
-      <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs font-semibold text-indigo-600">
-        <span>Start Practice</span>
-        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-      </div>
-    `;
-    grid.appendChild(card);
-
-    // 2. Create Header Dropdown Option
-    const dropdownItem = document.createElement('a');
-    dropdownItem.href = `#${topic.id}`;
-    dropdownItem.className = "block px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg font-medium transition";
-    dropdownItem.innerText = topic.title;
-    dropdownItem.onclick = (e) => {
-      e.preventDefault();
-      navigateToTopic(topic.id);
-    };
-    dropdownMenu.appendChild(dropdownItem);
-  });
-
-  lucide.createIcons();
-}
-
-    function startTopicQuiz(topicId) {
-      currentTopic = quizData.topics.find(t => t.id === topicId);
       currentQuestionIndex = 0;
-      if (!currentTopic || !currentTopic.questions.length) return;
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-quiz').classList.remove('hidden');
+      document.getElementById('current-topic-title').innerText = displayTitle;
 
-      showView('view-quiz');
-      document.getElementById('current-topic-title').innerText = currentTopic.title;
       loadQuestion();
     }
 
     function loadQuestion() {
-      const q = currentTopic.questions[currentQuestionIndex];
+      const q = activeQuestions[currentQuestionIndex];
       selectedOption = null;
       hintsRevealed = 0;
 
-      document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} of ${currentTopic.questions.length}`;
+      document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
       document.getElementById('question-difficulty').innerText = q.difficulty || 'Standard';
       document.getElementById('question-text').innerText = q.question;
 
@@ -661,12 +538,12 @@
       optionsContainer.innerHTML = '';
       q.options.forEach((optText, idx) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition font-medium text-slate-700 flex items-center justify-between option-btn";
+        btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition font-medium text-slate-700 flex items-center justify-between option-btn";
         btn.onclick = () => selectOption(idx, btn);
         btn.innerHTML = `
           <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 option-badge">${String.fromCharCode(65 + idx)}</span>
-            <span class="text-sm">${optText}</span>
+            <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">${String.fromCharCode(65 + idx)}</span>
+            <span>${optText}</span>
           </div>
         `;
         optionsContainer.appendChild(btn);
@@ -699,31 +576,29 @@
     }
 
     function revealHint() {
-      const q = currentTopic.questions[currentQuestionIndex];
+      const q = activeQuestions[currentQuestionIndex];
       if (!q.hints || hintsRevealed >= q.hints.length) return;
 
       const hintsBox = document.getElementById('hints-box');
       const hintsList = document.getElementById('hints-list');
       hintsBox.classList.remove('hidden');
 
-      const hintText = q.hints[hintsRevealed];
-      hintsRevealed++;
-
       const hintElem = document.createElement('div');
-      hintElem.className = "p-3 bg-white/80 rounded-xl border border-amber-200 text-amber-900 text-xs sm:text-sm";
-      hintElem.innerHTML = `<strong>Hint ${hintsRevealed}:</strong> ${hintText}`;
+      hintElem.className = "p-3 bg-white/80 rounded-lg border border-amber-200 text-amber-900";
+      hintElem.innerHTML = `<strong>Hint ${hintsRevealed + 1}:</strong> ${q.hints[hintsRevealed]}`;
       hintsList.appendChild(hintElem);
 
+      hintsRevealed++;
       document.getElementById('hints-remaining').innerText = q.hints.length - hintsRevealed;
       if (hintsRevealed >= q.hints.length) {
         document.getElementById('hint-btn').disabled = true;
       }
     }
 
-    function checkAnswer() {
+    async function checkAnswer() {
       if (selectedOption === null) return;
 
-      const q = currentTopic.questions[currentQuestionIndex];
+      const q = activeQuestions[currentQuestionIndex];
       const isCorrect = selectedOption === q.correctAnswer;
       const feedbackBox = document.getElementById('feedback-box');
 
@@ -731,44 +606,51 @@
       feedbackBox.classList.remove('hidden');
 
       if (isCorrect) {
-        if (typeof window.saveUserProgress === 'function') {
-          window.saveUserProgress(10, q.id);
+        userStats.xp = (userStats.xp || 0) + 10;
+        updateStatsDisplay();
+
+        // Save XP to Firestore if logged in
+        if (currentUser && window.fbMethods) {
+          try {
+            const docRef = window.fbMethods.doc(window.firebaseDb, "users", currentUser.uid);
+            await window.fbMethods.updateDoc(docRef, { xp: window.fbMethods.increment(10) });
+          } catch(e){}
         }
 
         if (typeof confetti === 'function') {
           confetti({ particleCount: 60, spread: 60, origin: { y: 0.8 } });
         }
 
-        feedbackBox.className = "p-6 border-t border-emerald-200 bg-emerald-50 rounded-b-3xl space-y-4";
+        feedbackBox.className = "p-6 border-t border-emerald-200 bg-emerald-50 rounded-b-2xl space-y-4";
         feedbackBox.innerHTML = `
           <div class="flex items-start gap-3">
             <div class="p-2 bg-emerald-500 text-white rounded-full"><i data-lucide="check" class="w-5 h-5"></i></div>
             <div>
-              <h3 class="text-lg font-bold text-emerald-900">Correct! (+10 XP)</h3>
+              <h3 class="text-lg font-bold text-emerald-900">Nice work! That's correct.</h3>
               <p class="text-sm text-emerald-700 mt-1">${q.explanation || 'Great job answering this problem.'}</p>
             </div>
           </div>
           <div class="flex justify-end">
-            <button onclick="nextQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2 text-sm">
+            <button onclick="nextQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
               Next Question <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
         `;
       } else {
-        feedbackBox.className = "p-6 border-t border-rose-200 bg-rose-50 rounded-b-3xl space-y-4";
+        feedbackBox.className = "p-6 border-t border-rose-200 bg-rose-50 rounded-b-2xl space-y-4";
         feedbackBox.innerHTML = `
           <div class="flex items-start gap-3">
             <div class="p-2 bg-rose-500 text-white rounded-full"><i data-lucide="x" class="w-5 h-5"></i></div>
             <div>
-              <h3 class="text-lg font-bold text-rose-900">Not quite</h3>
+              <h3 class="text-lg font-bold text-rose-900">Not quite yet</h3>
               <p class="text-sm text-rose-700 mt-1">${q.explanation || 'Review the hints or try again.'}</p>
             </div>
           </div>
           <div class="flex justify-end gap-3">
-            <button onclick="loadQuestion()" class="bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-5 py-2.5 rounded-xl font-bold transition text-sm">
+            <button onclick="loadQuestion()" class="bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-5 py-2.5 rounded-xl font-bold transition">
               Try Again
             </button>
-            <button onclick="nextQuestion()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2 text-sm">
+            <button onclick="nextQuestion()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
               Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
@@ -778,15 +660,16 @@
     }
 
     function nextQuestion() {
-      if (currentQuestionIndex < currentTopic.questions.length - 1) {
+      if (currentQuestionIndex < activeQuestions.length - 1) {
         currentQuestionIndex++;
         loadQuestion();
       } else {
-        showView('view-dashboard');
+        showTopicSelection();
+        alert("🎉 Topic Practice Completed!");
       }
     }
 
-    // Scratchpad canvas controls
+    // Scratchpad Logic
     function initScratchpad() {
       canvas = document.getElementById('scratchpad-canvas');
       ctx = canvas.getContext('2d');
@@ -838,31 +721,63 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Function to handle switching topics and updating the URL bar
-  function navigateToTopic(topicId) {
-    window.location.hash = topicId;
-    startTopicQuiz(topicId);
-  }
-
-  // Function to return to dashboard and clear URL hash
-  function showTopicSelection() {
-    history.pushState("", document.title, window.location.pathname + window.location.search);
-    document.getElementById('view-quiz').classList.add('hidden');
-    document.getElementById('view-dashboard').classList.remove('hidden');
-  }
-
-  // Listen for browser navigation / direct link access
-  function handleRoute() {
-    const topicId = window.location.hash.replace('#', '');
-    if (topicId && quizData.topics.some(t => t.id === topicId)) {
-      startTopicQuiz(topicId);
-    } else {
-      showTopicSelection();
+    // Authentication Modal & Methods
+    function openAuthModal(mode = 'signin') {
+      authMode = mode;
+      updateAuthModalUI();
+      document.getElementById('auth-modal').classList.remove('hidden');
     }
-  }
 
-  // Execute route check when page loads and when hash changes
-  window.addEventListener('hashchange', handleRoute);
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function toggleAuthMode() {
+      authMode = authMode === 'signin' ? 'signup' : 'signin';
+      updateAuthModalUI();
+    }
+
+    function updateAuthModalUI() {
+      document.getElementById('auth-modal-title').innerText = authMode === 'signin' ? 'Sign In to EduPractice' : 'Create an Account';
+      document.getElementById('auth-submit-btn').innerText = authMode === 'signin' ? 'Sign In' : 'Create Account';
+      document.getElementById('auth-toggle-text').innerText = authMode === 'signin' ? "Don't have an account?" : "Already have an account?";
+      document.getElementById('auth-toggle-btn').innerText = authMode === 'signin' ? 'Sign Up' : 'Sign In';
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value;
+      const password = document.getElementById('auth-password').value;
+
+      try {
+        if (authMode === 'signup') {
+          await window.fbMethods.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+        } else {
+          await window.fbMethods.signInWithEmailAndPassword(window.firebaseAuth, email, password);
+        }
+        closeAuthModal();
+      } catch (err) {
+        alert("Authentication Error: " + err.message);
+      }
+    }
+
+    async function handleGoogleSignIn() {
+      try {
+        const provider = new window.fbMethods.GoogleAuthProvider();
+        await window.fbMethods.signInWithPopup(window.firebaseAuth, provider);
+        closeAuthModal();
+      } catch (err) {
+        alert("Google Sign In Error: " + err.message);
+      }
+    }
+
+    async function handleSignOut() {
+      try {
+        await window.fbMethods.signOut(window.firebaseAuth);
+      } catch (err) {
+        console.error("Sign Out Error:", err);
+      }
+    }
   </script>
 </body>
 </html>
