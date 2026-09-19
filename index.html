@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Firebase Web SDK v9 (Modular via CDN scripts) -->
+  <!-- Firebase Web SDK v9 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -35,7 +35,6 @@
       increment 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // IMPORTANT: Replace this configuration with your actual Firebase project credentials
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -45,12 +44,10 @@
       appId: "YOUR_APP_ID"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Make Firebase services accessible globally to the app script
     window.firebaseAuth = auth;
     window.firebaseDb = db;
     window.fbMethods = {
@@ -69,19 +66,19 @@
   </script>
 
   <style>
-    /* Custom CSS for nested subtopic flyout menu on hover */
+    /* CSS to show the subtopic flyout menu on hover */
     .has-submenu:hover .submenu {
-      display: block;
+      display: block !important;
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
-  <!-- ==================== HEADER / NAVIGATION ==================== -->
+  <!-- ==================== HEADER ==================== -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       
-      <!-- Left: Logo & Navigation Menu -->
+      <!-- Logo & Navigation -->
       <div class="flex items-center space-x-6">
         <a href="#" onclick="showTopicSelection(); return false;" class="flex items-center space-x-3 text-slate-900 font-extrabold text-xl">
           <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-sm">
@@ -90,13 +87,12 @@
           <span class="hidden sm:inline tracking-tight">EduPractice</span>
         </a>
 
-        <!-- Navigation Dropdown -->
         <nav class="flex items-center space-x-4">
           <button onclick="showTopicSelection()" class="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition">
             Home
           </button>
 
-          <!-- Topics Dropdown Container -->
+          <!-- Topics Dropdown -->
           <div class="relative group">
             <button class="flex items-center space-x-1 text-sm font-semibold text-slate-600 hover:text-indigo-600 py-2 transition">
               <span>Topics</span>
@@ -111,10 +107,8 @@
         </nav>
       </div>
 
-      <!-- Right: User Stats Bar & Auth Button -->
+      <!-- Stats Bar & Auth -->
       <div class="flex items-center space-x-4">
-        
-        <!-- User Stats (Visible when logged in or guest practice) -->
         <div class="flex items-center space-x-3 text-sm font-medium">
           <div class="flex items-center space-x-1.5 text-amber-500 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
             <i data-lucide="flame" class="w-4 h-4 fill-amber-500"></i>
@@ -127,9 +121,7 @@
           </div>
         </div>
 
-        <!-- Auth Button State (Logged Out: Sign In / Sign Up | Logged In: Profile Menu) -->
         <div id="auth-header-container">
-          <!-- Logged Out View -->
           <div id="logged-out-view" class="flex items-center gap-2">
             <button onclick="openAuthModal('signin')" class="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 rounded-xl transition">
               Sign In
@@ -139,17 +131,13 @@
             </button>
           </div>
 
-          <!-- Logged In View -->
           <div id="logged-in-view" class="hidden relative group">
             <button class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 p-1.5 pr-3 rounded-full transition">
-              <div id="user-avatar" class="w-7 h-7 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-xs">
-                U
-              </div>
+              <div id="user-avatar" class="w-7 h-7 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-xs">U</div>
               <span id="user-display-name" class="text-xs font-semibold text-slate-700 max-w-[100px] truncate">User</span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-500"></i>
             </button>
 
-            <!-- User Menu Dropdown -->
             <div class="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 z-50">
               <div class="px-3 py-2 border-b border-slate-100 text-xs text-slate-500 truncate" id="user-email-label">user@example.com</div>
               <button onclick="handleSignOut()" class="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition flex items-center gap-2 mt-1">
@@ -159,16 +147,14 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </header>
 
-
-  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 my-4">
 
-    <!-- VIEW 1: Dashboard / Topic Selection -->
+    <!-- Dashboard View -->
     <div id="view-dashboard" class="space-y-6">
       <div class="text-center sm:text-left space-y-1">
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Interactive Practice Dashboard</h1>
@@ -176,14 +162,12 @@
       </div>
 
       <div id="topics-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        <!-- Dynamically populated topic cards -->
+        <!-- Topic cards dynamically loaded here -->
       </div>
     </div>
 
-    <!-- VIEW 2: Interactive Quiz View -->
+    <!-- Quiz View -->
     <div id="view-quiz" class="hidden space-y-6">
-      
-      <!-- Quiz Nav Bar -->
       <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         <button onclick="showTopicSelection()" class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-1.5 transition">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -200,10 +184,7 @@
         </button>
       </div>
 
-      <!-- Question Card -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative">
-        
-        <!-- Scratchpad Canvas Drawer -->
         <div id="scratchpad-drawer" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col p-4 border-b border-slate-200">
           <div class="flex justify-between items-center mb-2">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scratchpad Drawer</span>
@@ -215,7 +196,6 @@
           <canvas id="scratchpad-canvas" class="flex-1 border border-slate-200 rounded-lg cursor-crosshair bg-white"></canvas>
         </div>
 
-        <!-- Question Box -->
         <div class="p-6 sm:p-8 space-y-4">
           <div class="flex justify-between items-center text-xs text-slate-400 font-semibold tracking-wide uppercase">
             <span id="question-tracker">Question 1 of 5</span>
@@ -231,14 +211,10 @@
           </div>
         </div>
 
-        <!-- MCQ Options -->
         <div class="px-6 sm:px-8 pb-6">
-          <div id="options-container" class="space-y-3">
-            <!-- Dynamic choices -->
-          </div>
+          <div id="options-container" class="space-y-3"></div>
         </div>
 
-        <!-- Action Controls Bar -->
         <div id="action-bar" class="bg-slate-50 border-t border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <button id="hint-btn" onclick="revealHint()" class="w-full sm:w-auto text-indigo-600 hover:text-indigo-700 text-sm font-semibold flex items-center justify-center gap-1.5 transition">
             <i data-lucide="lightbulb" class="w-4 h-4"></i>
@@ -250,23 +226,18 @@
           </button>
         </div>
 
-        <!-- Feedback & Hints Container -->
         <div id="feedback-box" class="hidden p-6 border-t"></div>
         <div id="hints-box" class="hidden border-t border-amber-100 bg-amber-50/60 p-6 space-y-3">
           <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
-            <i data-lucide="help-circle" class="w-4 h-4"></i>
-            Hints
+            <i data-lucide="help-circle" class="w-4 h-4"></i> Hints
           </h4>
           <div id="hints-list" class="space-y-2 text-sm text-amber-900"></div>
         </div>
-
       </div>
     </div>
-
   </main>
 
-
-  <!-- ==================== AUTHENTICATION MODAL ==================== -->
+  <!-- Auth Modal -->
   <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative border border-slate-100">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
@@ -283,12 +254,10 @@
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Address</label>
           <input type="email" id="auth-email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
         </div>
-
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
           <input type="password" id="auth-password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
         </div>
-
         <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md">
           Sign In
         </button>
@@ -301,8 +270,7 @@
       </div>
 
       <button onclick="handleGoogleSignIn()" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
-        <i data-lucide="chrome" class="w-4 h-4"></i>
-        Continue with Google
+        <i data-lucide="chrome" class="w-4 h-4"></i> Continue with Google
       </button>
 
       <div class="mt-6 text-center text-xs text-slate-500">
@@ -312,23 +280,16 @@
     </div>
   </div>
 
-
-  <!-- ==================== APPLICATION SCRIPT ==================== -->
+  <!-- Script Logic -->
   <script>
-    // State Management
     let quizData = { topics: [] };
-    let currentTopic = null;
     let activeQuestions = [];
     let currentQuestionIndex = 0;
     let selectedOption = null;
     let hintsRevealed = 0;
-    let authMode = 'signin'; // 'signin' or 'signup'
-
-    // User Profile Stats
+    let authMode = 'signin';
     let currentUser = null;
     let userStats = { xp: 0, streak: 0 };
-
-    // Canvas variables
     let canvas, ctx, isDrawing = false;
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -340,15 +301,12 @@
           handleRoute();
           lucide.createIcons();
         })
-        .catch(err => {
-          console.error("Failed to load questions.json", err);
-        });
+        .catch(err => console.error("Failed to load questions.json", err));
 
       initScratchpad();
       initFirebaseObserver();
     });
 
-    // Observe Firebase Auth State
     function initFirebaseObserver() {
       const checkFb = setInterval(() => {
         if (window.firebaseAuth && window.fbMethods) {
@@ -361,8 +319,6 @@
               document.getElementById('user-display-name').innerText = user.displayName || user.email.split('@')[0];
               document.getElementById('user-email-label').innerText = user.email;
               document.getElementById('user-avatar').innerText = (user.email[0] || 'U').toUpperCase();
-
-              // Fetch User Firestore Data
               await fetchUserData(user.uid);
             } else {
               document.getElementById('logged-out-view').classList.remove('hidden');
@@ -386,9 +342,7 @@
           await window.fbMethods.setDoc(docRef, userStats);
         }
         updateStatsDisplay();
-      } catch (err) {
-        console.log("Firestore note: Configure credentials to persist cloud stats.", err);
-      }
+      } catch (err) {}
     }
 
     function updateStatsDisplay() {
@@ -396,7 +350,7 @@
       document.getElementById('streak-count').innerText = userStats.streak || 0;
     }
 
-    // Render Navigation Menu & Dashboard Cards
+    // Function that handles building the nested dropdown
     function renderTopicMenuAndCards() {
       const grid = document.getElementById('topics-grid');
       const dropdownMenu = document.getElementById('dropdown-topics-menu');
@@ -405,7 +359,11 @@
       dropdownMenu.innerHTML = '';
 
       quizData.topics.forEach((topic) => {
-        // 1. Dashboard Card
+        // 1. Dashboard Cards
+        const totalQuestions = topic.subtopics 
+          ? topic.subtopics.reduce((sum, s) => sum + (s.questions ? s.questions.length : 0), 0)
+          : (topic.questions ? topic.questions.length : 0);
+
         const card = document.createElement('div');
         card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group";
         card.onclick = () => navigateToTopic(topic.id);
@@ -415,7 +373,7 @@
               <span class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">
                 <i data-lucide="${topic.icon || 'book-open'}" class="w-6 h-6"></i>
               </span>
-              <span class="text-xs font-semibold text-slate-400">${topic.questions ? topic.questions.length : 0} questions</span>
+              <span class="text-xs font-semibold text-slate-400">${totalQuestions} questions</span>
             </div>
             <h3 class="text-lg font-bold text-slate-900 mb-1">${topic.title}</h3>
             <p class="text-sm text-slate-500 mb-4">${topic.description}</p>
@@ -427,18 +385,17 @@
         `;
         grid.appendChild(card);
 
-        // 2. Multi-Level Dropdown Navigation
+        // 2. Dropdown Item Rendering (Checks if subtopics exist!)
         const menuItem = document.createElement('div');
         menuItem.className = "relative group/sub has-submenu";
 
         if (topic.subtopics && topic.subtopics.length > 0) {
-          // Topic item with subtopics menu
+          // Has subtopics -> Render parent with flyout side menu
           menuItem.innerHTML = `
             <div class="flex items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl font-medium cursor-pointer transition">
               <span onclick="navigateToTopic('${topic.id}')">${topic.title}</span>
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
             </div>
-            <!-- Flyout Submenu -->
             <div class="submenu hidden absolute left-full top-0 ml-1 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
               <div class="text-[10px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider border-b border-slate-100 mb-1">
                 ${topic.title} Subtopics
@@ -451,7 +408,7 @@
             </div>
           `;
         } else {
-          // Standard topic link
+          // Flat topic without subtopics
           menuItem.innerHTML = `
             <a href="#${topic.id}" onclick="event.preventDefault(); navigateToTopic('${topic.id}');" class="block px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl font-medium transition">
               ${topic.title}
@@ -464,7 +421,6 @@
       lucide.createIcons();
     }
 
-    // Navigation & Hash Routing
     function navigateToTopic(targetId) {
       window.location.hash = targetId;
       startTopicQuiz(targetId);
@@ -487,15 +443,18 @@
 
     window.addEventListener('hashchange', handleRoute);
 
-    // Quiz Execution Engine
     function startTopicQuiz(targetId) {
       activeQuestions = [];
       let displayTitle = "Practice";
 
-      // Match parent topic or subtopic ID
       quizData.topics.forEach(t => {
         if (t.id === targetId) {
-          activeQuestions = t.questions || [];
+          if (t.questions) {
+            activeQuestions = t.questions;
+          } else if (t.subtopics) {
+            // Combine subtopics if parent is clicked
+            activeQuestions = t.subtopics.flatMap(s => s.questions || []);
+          }
           displayTitle = t.title;
         } else if (t.subtopics) {
           t.subtopics.forEach(s => {
@@ -609,7 +568,6 @@
         userStats.xp = (userStats.xp || 0) + 10;
         updateStatsDisplay();
 
-        // Save XP to Firestore if logged in
         if (currentUser && window.fbMethods) {
           try {
             const docRef = window.fbMethods.doc(window.firebaseDb, "users", currentUser.uid);
@@ -669,7 +627,6 @@
       }
     }
 
-    // Scratchpad Logic
     function initScratchpad() {
       canvas = document.getElementById('scratchpad-canvas');
       ctx = canvas.getContext('2d');
@@ -721,7 +678,6 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Authentication Modal & Methods
     function openAuthModal(mode = 'signin') {
       authMode = mode;
       updateAuthModalUI();
