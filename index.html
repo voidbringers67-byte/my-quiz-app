@@ -336,8 +336,8 @@
     let quizData = { topics: [] };
     let activeQuestions = [];
     let currentQuestionIndex = 0;
-    let selectedOption = null; // For MCQ questions
-    let userNumericAnswer = ""; // For Numeric questions
+    let selectedOption = null;
+    let userNumericAnswer = "";
     let hintsRevealed = 0;
     let authMode = 'signin';
     let currentUser = null;
@@ -442,7 +442,6 @@
         const menuItem = document.createElement('div');
         menuItem.className = "relative group/sub has-submenu";
 
-        // Dropdown Menu Construction Snippet
         if (hasSubtopics) {
           menuItem.innerHTML = `
             <div onclick="navigateToTopic('${topic.id}')" class="flex items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl font-medium cursor-pointer transition">
@@ -471,7 +470,7 @@
                         </a>
                       `).join('')}
                       <a href="#${sub.id}" onclick="event.preventDefault(); navigateToTopic('${sub.id}');" class="block px-3 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition border-t border-slate-100 mt-1">
-                        1.3 Practice Problems
+                        Practice Problems
                       </a>
                     </div>
                   ` : ''}
@@ -479,7 +478,7 @@
               `).join('')}
             </div>
           `;
-          } else {
+        } else {
           menuItem.innerHTML = `
             <a href="#${topic.id}" onclick="event.preventDefault(); navigateToTopic('${topic.id}');" class="block px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl font-medium transition">
               ${topic.title}
@@ -516,20 +515,17 @@
         return;
       }
 
-      // 1. Check if the hash matches a Parent Topic with subtopics
       const topicMatch = quizData.topics.find(t => t.id === routeId);
       if (topicMatch && topicMatch.subtopics && topicMatch.subtopics.length > 0) {
         renderTopicOverview(topicMatch);
         return;
       }
 
-      // 2. Otherwise start quiz for topic without subtopics OR for a specific subtopic
       startTopicQuiz(routeId);
     }
 
     window.addEventListener('hashchange', handleRoute);
 
-    // Render Root Topic Page (Shows list of Subtopics)
     function renderTopicOverview(topic) {
       hideAllViews();
       document.getElementById('view-topic-overview').classList.remove('hidden');
@@ -558,7 +554,6 @@
       const list = document.getElementById('subtopics-list');
       list.innerHTML = '';
 
-      // Subtopic Card Rendering with Resource Links
       topic.subtopics.forEach(sub => {
         const qCount = sub.questions ? sub.questions.length : 0;
         const item = document.createElement('div');
@@ -570,7 +565,6 @@
             <span class="text-xs text-slate-400 font-medium">${qCount} practice questions</span>
           </div>
       
-          <!-- Links & Sub-items Bar -->
           <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
             ${sub.links ? sub.links.map(link => `
               <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
@@ -580,7 +574,7 @@
               </a>
             `).join('') : ''}
       
-            <button onclick="navigateToTopic('${sub.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ml-auto">
+            <button onclick="startTopicQuiz('${sub.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ml-auto">
               <i data-lucide="brain" class="w-3.5 h-3.5"></i>
               Practice Problems
             </button>
@@ -617,7 +611,10 @@
         }
       });
 
-      if (!activeQuestions.length) return;
+      if (!activeQuestions.length) {
+        alert("No questions found for this topic yet.");
+        return;
+      }
 
       currentQuestionIndex = 0;
       hideAllViews();
@@ -643,7 +640,6 @@
       document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
       document.getElementById('question-text').innerText = q.question;
 
-      // Question Type Badge
       const typeBadge = document.getElementById('question-type-badge');
       if (q.type === 'numeric') {
         typeBadge.innerText = "Numeric Input";
@@ -653,7 +649,6 @@
         typeBadge.className = "text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md font-bold text-[11px] border border-indigo-200 tracking-wider uppercase";
       }
 
-      // Code Snippet Box
       const codeContainer = document.getElementById('code-snippet-container');
       if (q.codeSnippet) {
         document.getElementById('code-snippet').innerText = q.codeSnippet;
@@ -662,7 +657,6 @@
         codeContainer.classList.add('hidden');
       }
 
-      // Render either MCQ or Numeric layout
       const optionsContainer = document.getElementById('options-container');
       const numericContainer = document.getElementById('numeric-container');
 
@@ -678,27 +672,27 @@
         optionsContainer.classList.remove('hidden');
 
         optionsContainer.innerHTML = '';
-        q.options.forEach((optText, idx) => {
-          const btn = document.createElement('button');
-          btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition font-medium text-slate-700 flex items-center justify-between option-btn";
-          btn.onclick = () => selectOption(idx, btn);
-          btn.innerHTML = `
-            <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">${String.fromCharCode(65 + idx)}</span>
-              <span>${optText}</span>
-            </div>
-          `;
-          optionsContainer.appendChild(btn);
-        });
+        if (q.options) {
+          q.options.forEach((optText, idx) => {
+            const btn = document.createElement('button');
+            btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition font-medium text-slate-700 flex items-center justify-between option-btn";
+            btn.onclick = () => selectOption(idx, btn);
+            btn.innerHTML = `
+              <div class="flex items-center gap-3">
+                <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">${String.fromCharCode(65 + idx)}</span>
+                <span>${optText}</span>
+              </div>
+            `;
+            optionsContainer.appendChild(btn);
+          });
+        }
       }
 
-      // Hints setup
       document.getElementById('hints-remaining').innerText = q.hints ? q.hints.length : 0;
       document.getElementById('hint-btn').disabled = !q.hints || q.hints.length === 0;
       document.getElementById('hints-box').classList.add('hidden');
       document.getElementById('hints-list').innerHTML = '';
 
-      // Feedback box reset
       const feedbackBox = document.getElementById('feedback-box');
       feedbackBox.className = "hidden p-6 border-t";
       feedbackBox.innerHTML = '';
@@ -771,7 +765,6 @@
         if (!isNaN(parsedInput) && !isNaN(targetVal)) {
           isCorrect = Math.abs(parsedInput - targetVal) <= tol;
         } else {
-          // Exact string matching for fraction or discrete numeric strings
           isCorrect = userNumericAnswer.toLowerCase() === String(q.correctNumericAnswer).trim().toLowerCase();
         }
       } else {
