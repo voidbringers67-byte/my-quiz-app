@@ -45,7 +45,6 @@
       measurementId: "G-085PTM2L9M"
     };
 
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -134,7 +133,7 @@
 
           <div id="logged-in-view" class="hidden relative group">
             <button class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 p-1.5 pr-3 rounded-full transition">
-              <div id="user-avatar" class="w-7 h-7 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-xs">U</div>
+              <div id="user-avatar" class="w-7 h-7 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-xs overflow-hidden">U</div>
               <span id="user-display-name" class="text-xs font-semibold text-slate-700 max-w-[100px] truncate">User</span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-500"></i>
             </button>
@@ -142,7 +141,7 @@
             <div class="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 z-50">
               <div class="px-3 py-2 border-b border-slate-100 text-xs text-slate-500 truncate" id="user-email-label">user@example.com</div>
               <button onclick="showProfileSettings()" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg transition flex items-center gap-2 mt-1">
-              <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                <i data-lucide="user" class="w-3.5 h-3.5"></i>
                 Profile Settings
               </button>
             
@@ -160,15 +159,85 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 my-4">
 
-    <!-- 1. Dashboard View -->
+    <!-- 1. Home / Dashboard Profile View -->
     <div id="view-dashboard" class="space-y-6">
-      <div class="text-center sm:text-left space-y-1">
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Interactive Practice Dashboard</h1>
-        <p class="text-slate-500">Select a topic below to explore its subtopics or start practicing.</p>
+      
+      <!-- Profile Header Card (Top Left Bio & Picture) -->
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        <div id="home-profile-avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-indigo-600 text-white font-bold text-3xl flex items-center justify-center shrink-0 shadow-md overflow-hidden">
+          U
+        </div>
+        <div class="space-y-2 text-center sm:text-left flex-1">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h1 id="home-profile-name" class="text-2xl font-extrabold text-slate-900">Welcome User</h1>
+            <button onclick="showProfileSettings()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl transition self-center sm:self-auto flex items-center gap-1.5">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit Profile
+            </button>
+          </div>
+          <p id="home-profile-bio" class="text-sm text-slate-500 leading-relaxed max-w-xl">
+            No bio added yet. Click edit profile to tell us a little bit about yourself and set up your student profile!
+          </p>
+        </div>
       </div>
 
-      <div id="topics-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        <!-- Topic cards dynamically loaded here -->
+      <!-- Badge Collection Section -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="award" class="w-5 h-5 text-indigo-600"></i> Badge Collection
+          </h2>
+          <span class="text-xs font-semibold text-slate-400">4 Badges Available</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Badge 1 -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-3 group hover:border-indigo-300 transition">
+            <div class="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-500 shadow-inner group-hover:scale-105 transition-transform">
+              <i data-lucide="flame" class="w-8 h-8 fill-amber-500"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Streak Master</h3>
+              <p class="text-xs text-slate-500 mt-1">Maintain a practice streak for 3 consecutive days.</p>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full mt-auto">Locked</span>
+          </div>
+
+          <!-- Badge 2 -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-3 group hover:border-indigo-300 transition">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-inner group-hover:scale-105 transition-transform">
+              <i data-lucide="zap" class="w-8 h-8 fill-emerald-500"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">XP Grinder</h3>
+              <p class="text-xs text-slate-500 mt-1">Accumulate a total of 100 practice XP points.</p>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full mt-auto">Locked</span>
+          </div>
+
+          <!-- Badge 3 -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-3 group hover:border-indigo-300 transition">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shadow-inner group-hover:scale-105 transition-transform">
+              <i data-lucide="compass" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Geometry Explorer</h3>
+              <p class="text-xs text-slate-500 mt-1">Complete all practice problems in the Geometry section.</p>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full mt-auto">Locked</span>
+          </div>
+
+          <!-- Badge 4 -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-3 group hover:border-indigo-300 transition">
+            <div class="w-16 h-16 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-inner group-hover:scale-105 transition-transform">
+              <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">First Steps</h3>
+              <p class="text-xs text-slate-500 mt-1">Successfully answer your very first practice question.</p>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full mt-auto">Unlocked</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -177,7 +246,7 @@
       <div class="flex items-center justify-between">
         <button onclick="showDashboard()" class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-1.5 transition">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
-          Back to Dashboard
+          Back to Home
         </button>
         <h1 class="text-xl font-bold text-slate-900">Profile Settings</h1>
       </div>
@@ -218,7 +287,7 @@
       <div class="flex items-center justify-between">
         <button onclick="showDashboard()" class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-1.5 transition">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
-          Back to Dashboard
+          Back to Home
         </button>
       </div>
 
@@ -389,7 +458,7 @@
     let hintsRevealed = 0;
     let authMode = 'signin';
     let currentUser = null;
-    let userStats = { xp: 0, streak: 0 };
+    let userStats = { xp: 0, streak: 0, displayName: '', bio: '', avatarUrl: '' };
     let canvas, ctx, isDrawing = false;
     let activeParentTopicId = null;
 
@@ -408,12 +477,37 @@
       initFirebaseObserver();
     });
 
-    
     function hideAllViews() {
       document.getElementById('view-dashboard').classList.add('hidden');
       document.getElementById('view-topic-overview').classList.add('hidden');
       document.getElementById('view-quiz').classList.add('hidden');
-      document.getElementById('view-profile').classList.add('hidden'); // Added profile view hide
+      document.getElementById('view-profile').classList.add('hidden');
+    }
+
+    function showDashboard() {
+      history.pushState("", document.title, window.location.pathname + window.location.search);
+      hideAllViews();
+      document.getElementById('view-dashboard').classList.remove('hidden');
+      updateHomeProfileUI();
+      lucide.createIcons();
+    }
+
+    function updateHomeProfileUI() {
+      const nameElem = document.getElementById('home-profile-name');
+      const bioElem = document.getElementById('home-profile-bio');
+      const avatarElem = document.getElementById('home-profile-avatar');
+
+      const displayName = userStats.displayName || (currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Student');
+      const bio = userStats.bio || 'No bio added yet. Click edit profile to tell us a little bit about yourself and set up your student profile!';
+      
+      nameElem.innerText = displayName;
+      bioElem.innerText = bio;
+
+      if (userStats.avatarUrl) {
+        avatarElem.innerHTML = `<img src="${userStats.avatarUrl}" class="w-full h-full object-cover">`;
+      } else {
+        avatarElem.innerText = (displayName[0] || 'U').toUpperCase();
+      }
     }
     
     function showProfileSettings() {
@@ -424,7 +518,6 @@
       hideAllViews();
       document.getElementById('view-profile').classList.remove('hidden');
     
-      // Populate form fields with current values stored in userStats
       document.getElementById('profile-name-input').value = userStats.displayName || currentUser.displayName || '';
       document.getElementById('profile-bio-input').value = userStats.bio || '';
       document.getElementById('profile-avatar-input').value = userStats.avatarUrl || '';
@@ -447,15 +540,12 @@
       try {
         const docRef = window.fbMethods.doc(window.firebaseDb, "users", currentUser.uid);
         
-        // Update local userStats object
         userStats.displayName = newName;
         userStats.bio = newBio;
         userStats.avatarUrl = newAvatar;
     
-        // Save to Firestore
         await window.fbMethods.setDoc(docRef, userStats, { merge: true });
     
-        // Update Header Display Name
         document.getElementById('user-display-name').innerText = newName || currentUser.email.split('@')[0];
         
         if (newAvatar) {
@@ -478,7 +568,6 @@
         const docSnap = await window.fbMethods.getDoc(docRef);
         if (docSnap.exists()) {
           userStats = docSnap.data();
-          // Update name and avatar if saved in Firestore
           if (userStats.displayName) {
             document.getElementById('user-display-name').innerText = userStats.displayName;
           }
@@ -486,10 +575,11 @@
             document.getElementById('user-avatar').innerHTML = `<img src="${userStats.avatarUrl}" class="w-full h-full rounded-full object-cover">`;
           }
         } else {
-          userStats = { xp: 0, streak: 1, displayName: currentUser.displayName || '' };
+          userStats = { xp: 0, streak: 1, displayName: currentUser.displayName || '', bio: '', avatarUrl: '' };
           await window.fbMethods.setDoc(docRef, userStats);
         }
         updateStatsDisplay();
+        updateHomeProfileUI();
       } catch (err) {}
     }
     
@@ -509,26 +599,13 @@
             } else {
               document.getElementById('logged-out-view').classList.remove('hidden');
               document.getElementById('logged-in-view').classList.add('hidden');
-              userStats = { xp: 0, streak: 0 };
+              userStats = { xp: 0, streak: 0, displayName: '', bio: '', avatarUrl: '' };
               updateStatsDisplay();
+              updateHomeProfileUI();
             }
           });
         }
       }, 200);
-    }
-
-    async function fetchUserData(uid) {
-      try {
-        const docRef = window.fbMethods.doc(window.firebaseDb, "users", uid);
-        const docSnap = await window.fbMethods.getDoc(docRef);
-        if (docSnap.exists()) {
-          userStats = docSnap.data();
-        } else {
-          userStats = { xp: 0, streak: 1 };
-          await window.fbMethods.setDoc(docRef, userStats);
-        }
-        updateStatsDisplay();
-      } catch (err) {}
     }
 
     function updateStatsDisplay() {
@@ -537,41 +614,11 @@
     }
 
     function renderTopicMenuAndCards() {
-      const grid = document.getElementById('topics-grid');
       const dropdownMenu = document.getElementById('dropdown-topics-menu');
-
-      grid.innerHTML = '';
       dropdownMenu.innerHTML = '';
 
       quizData.topics.forEach((topic) => {
         const hasSubtopics = topic.subtopics && topic.subtopics.length > 0;
-        const totalQuestions = hasSubtopics 
-          ? topic.subtopics.reduce((sum, s) => sum + (s.questions ? s.questions.length : 0), 0)
-          : (topic.questions ? topic.questions.length : 0);
-
-        // 1. Dashboard Cards
-        const card = document.createElement('div');
-        card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group";
-        card.onclick = () => navigateToTopic(topic.id);
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition">
-                <i data-lucide="${topic.icon || 'book-open'}" class="w-6 h-6"></i>
-              </span>
-              <span class="text-xs font-semibold text-slate-400">${totalQuestions} questions</span>
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-1">${topic.title}</h3>
-            <p class="text-sm text-slate-500 mb-4">${topic.description}</p>
-          </div>
-          <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs font-semibold text-indigo-600">
-            <span>${hasSubtopics ? 'Explore Subtopics' : 'Start Practice'}</span>
-            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        `;
-        grid.appendChild(card);
-
-        // 2. Dropdown Header Menu
         const menuItem = document.createElement('div');
         menuItem.className = "relative group/sub has-submenu";
 
@@ -627,18 +674,6 @@
     function navigateToTopic(targetId) {
       window.location.hash = targetId;
       handleRoute();
-    }
-
-    function hideAllViews() {
-      document.getElementById('view-dashboard').classList.add('hidden');
-      document.getElementById('view-topic-overview').classList.add('hidden');
-      document.getElementById('view-quiz').classList.add('hidden');
-    }
-
-    function showDashboard() {
-      history.pushState("", document.title, window.location.pathname + window.location.search);
-      hideAllViews();
-      document.getElementById('view-dashboard').classList.remove('hidden');
     }
 
     function handleRoute() {
