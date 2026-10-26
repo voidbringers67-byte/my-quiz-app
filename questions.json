@@ -62,7 +62,7 @@
         { "id": "correspondences", "title": "10. 1-1 correspondences", "questions": [] },
         { "id": "expected-value", "title": "11. Expected Value", "questions": [] },
         { "id": "recursion", "title": "12. Recursion", "questions": [] },
-        { "id": "generating-functions", "title": "13. Generating Functions", "questions": [] },
+        { "id": "generating-functions", "title": "13. Generating Functions", "questions": [] }
       ]
     },
     {
@@ -79,7 +79,7 @@
         { "id": "factorization-tricks", "title": "6. Factorization Tricks", "questions": [] }, 
         { "id": "SFFT", "title": "7. SFFT", "questions": [] }, 
         { "id": "induction", "title": "8. Induction", "questions": [] }, 
-        { "id": "fibonacci-sequence", "title": "9. Fibonacci Sequence", "questions": [] }, 
+        { "id": "fibonacci-sequence", "title": "9. Fibonacci Sequence", "questions": [] }
       ]
     },
     {
@@ -99,7 +99,7 @@
         { "id": "polynomial-division-synthetic-division", "title": "9. Polynomial Division and Synthetic Division", "questions": [] }, 
         { "id": "roots-and-RRT", "title": "10. Roots of Polynomials and RRT", "questions": [] }, 
         { "id": "descartes-rule-of-signs", "title": "11. Descarte's Rule of Signs", "questions": [] }, 
-        { "id": "newtonian-sums", "title": "12. Newtonian Sums", "questions": [] }, 
+        { "id": "newtonian-sums", "title": "12. Newtonian Sums", "questions": [] }
       ]
     }
   ]
