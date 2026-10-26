@@ -43,6 +43,64 @@
         { "id": "ptolemy-theorem", "title": "10. Ptolemy’s Theorem", "questions": [] },
         { "id": "stewart-theorem", "title": "11. Stewart’s Theorem", "questions": [] }
       ]
+    },
+    {
+      "id": "Comb",
+      "title": "Combinatorics",
+      "description": "Master triangles, trigonometry, circles, and key geometric theorems.",
+      "icon": "shapes",
+      "subtopics": [
+        { "id": "factorials", "title": "1. Factorials", "questions": [] }, 
+        { "id": "permutations", "title": "2. Permutations", "questions": [] },
+        { "id": "Combinations", "title": "3. Combinations", "questions": [] },
+        { "id": "basic-counting", "title": "4. Basic Counting", "questions": [] },
+        { "id": "counting-circles-and-reflections", "title": "5. Counting for Circles and Reflections", "questions": [] },
+        { "id": "complementary-counting", "title": "6. Complementary Counting", "questions": [] },
+        { "id": "casework", "title": "7. Casework", "questions": [] },
+        { "id": "pie", "title": "8. PIE", "questions": [] },
+        { "id": "advanced-pie", "title": "9. Advanced PIE", "questions": [] },
+        { "id": "correspondences", "title": "10. 1-1 correspondences", "questions": [] },
+        { "id": "expected-value", "title": "11. Expected Value", "questions": [] },
+        { "id": "recursion", "title": "12. Recursion", "questions": [] },
+        { "id": "generating-functions", "title": "13. Generating Functions", "questions": [] },
+      ]
+    },
+    {
+      "id": "Num-Theory",
+      "title": "Number Theory",
+      "description": "Master triangles, trigonometry, circles, and key geometric theorems.",
+      "icon": "shapes",
+      "subtopics": [
+        { "id": "prime-factorization", "title": "1. Prime Factorization", "questions": [] }, 
+        { "id": "num-theory-rules", "title": "2. Number Thoery Rules", "questions": [] }, 
+        { "id": "modulus", "title": "3. Modulus", "questions": [] }, 
+        { "id": "div-rules", "title": "4. Divisibility Rules", "questions": [] }, 
+        { "id": "more-modulus", "title": "5. More Modulus", "questions": [] }, 
+        { "id": "factorization-tricks", "title": "6. Factorization Tricks", "questions": [] }, 
+        { "id": "SFFT", "title": "7. SFFT", "questions": [] }, 
+        { "id": "induction", "title": "8. Induction", "questions": [] }, 
+        { "id": "fibonacci-sequence", "title": "9. Fibonacci Sequence", "questions": [] }, 
+      ]
+    },
+    {
+      "id": "Algebra",
+      "title": "Algebra",
+      "description": "Master triangles, trigonometry, circles, and key geometric theorems.",
+      "icon": "shapes",
+      "subtopics": [
+        { "id": "elimination-substitution", "title": "1. Elimination and Substitution", "questions": [] },
+        { "id": "sys-of-equations", "title": "2. System of Equations", "questions": [] }, 
+        { "id": "graphing", "title": "3. Graphing", "questions": [] }, 
+        { "id": "graphs-common-functions", "title": "4. Graphs of Common Functions", "questions": [] }, 
+        { "id": "trivial-inequality", "title": "5. Trivial Inequality", "questions": [] }, 
+        { "id": "factorization-tricks", "title": "6. Factorization Tricks", "questions": [] }, 
+        { "id": "binomial-theorem", "title": "7. Binomial Theorem", "questions": [] }, 
+        { "id": "roots-of-quadratics", "title": "8. Roots of Quadratics", "questions": [] }, 
+        { "id": "polynomial-division-synthetic-division", "title": "9. Polynomial Division and Synthetic Division", "questions": [] }, 
+        { "id": "roots-and-RRT", "title": "10. Roots of Polynomials and RRT", "questions": [] }, 
+        { "id": "descartes-rule-of-signs", "title": "11. Descarte's Rule of Signs", "questions": [] }, 
+        { "id": "newtonian-sums", "title": "12. Newtonian Sums", "questions": [] }, 
+      ]
     }
   ]
 }
