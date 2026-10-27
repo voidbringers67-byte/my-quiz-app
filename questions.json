@@ -134,7 +134,7 @@
             "id": "Comb-q3",
               "type": "mcq",
               "difficulty": "Easy",
-              "question": How many ordered arrangements are there of letters a, b, c, d, and e? ",
+              "question": "How many ordered arrangements are there of letters a, b, c, d, and e? ",
               "options": ["20","60","120","240"],
               "correctAnswer": 2
               "explanation": "",
