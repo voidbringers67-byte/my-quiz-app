@@ -6,10 +6,7 @@
       "description": "Master triangles, trigonometry, circles, and key geometric theorems.",
       "icon": "shapes",
       "subtopics": [
-        {
-          "id": "law-of-sines",
-          "title": "1. Law of Sines",
-          "links": [
+        {"id": "law-of-sines", "title": "1. Law of Sines", "links": [
             { "title": "1.1 Video Explanation", "url": "https://www.youtube.com/watch?v=EXAMPLE", "type": "video" },
             { "title": "1.2 Article Explanation", "url": "https://example.com/law-of-sines", "type": "article" }
           ],
@@ -19,7 +16,7 @@
               "type": "numeric",
               "difficulty": "Easy",
               "question": "In triangle ABC, side a = 10, angle A = 30°, and angle B = 45°. Find side b (round to 2 decimal places).",
-              "correctNumericAnswer": 14.14,
+              "correctNumericAnswer": 14.14
               "explanation": "By the Law of Sines: b / sin(45°) = 10 / sin(30°). Thus b = 10 * sin(45°) / sin(30°) = 10 * 0.7071 / 0.5 = 14.14.",
               "hints": [
                 "Use the formula: a / sin(A) = b / sin(B).",
@@ -28,9 +25,7 @@
             }
           ]
         },
-        {
-          "id": "law-of-cosines",
-          "title": "2. Law of Cosines",
+        {"id": "law-of-cosines", "title": "2. Law of Cosines", 
           "questions": []
         },
         { "id": "trig-identities", "title": "3. Trig identities", "questions": [] },
@@ -50,7 +45,20 @@
       "description": "Master triangles, trigonometry, circles, and key geometric theorems.",
       "icon": "shapes",
       "subtopics": [
-        { "id": "factorials", "title": "1. Factorials", "questions": [] }, 
+        { "id": "factorials", "title": "1. Factorials", "questions": [
+          {
+            "id": "Comb-q1",
+              "type": "mcq",
+              "difficulty": "Easy",
+              "question": "Find 7!  (No Calculator!)",
+              "correctNumericAnswer": 14.14
+              "explanation": "By the Law of Sines: b / sin(45°) = 10 / sin(30°). Thus b = 10 * sin(45°) / sin(30°) = 10 * 0.7071 / 0.5 = 14.14.",
+              "hints": [
+                "Use the formula: a / sin(A) = b / sin(B).",
+                "sin(30°) = 0.5 and sin(45°) ≈ 0.7071."
+              ]
+          }
+        ] }, 
         { "id": "permutations", "title": "2. Permutations", "questions": [] },
         { "id": "Combinations", "title": "3. Combinations", "questions": [] },
         { "id": "basic-counting", "title": "4. Basic Counting", "questions": [] },
