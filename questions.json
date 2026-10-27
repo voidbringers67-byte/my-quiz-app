@@ -51,15 +51,109 @@
               "type": "mcq",
               "difficulty": "Easy",
               "question": "Find 7!  (No Calculator!)",
-              "correctNumericAnswer": 14.14
-              "explanation": "By the Law of Sines: b / sin(45°) = 10 / sin(30°). Thus b = 10 * sin(45°) / sin(30°) = 10 * 0.7071 / 0.5 = 14.14.",
+              "options" = ["720", "40320", "5040", "5060"],
+              "correctAnswer": 2
+              "explanation": "",
               "hints": [
-                "Use the formula: a / sin(A) = b / sin(B).",
-                "sin(30°) = 0.5 and sin(45°) ≈ 0.7071."
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q2",
+              "type": "mcq",
+              "difficulty": "Easy",
+              "question": "Find 10!/7!4!  (No Calculator!)",
+              "options" = ["1", "10", "15", "20"],
+              "correctAnswer": 2
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q3",
+              "type": "mcq",
+              "difficulty": "Easy",
+              "question": "Find 11!/9!2! (No Calculator!)",
+              "options" = ["55", "42", "1", "22"],
+              "correctAnswer": 0
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q4",
+              "type": "numeric",
+              "difficulty": "Medium",
+              "question": "If x is a positive integer and x!/(x-2)!2 = 180, find the value of x)",
+              "correctNumericAnswer": 10
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q5",
+              "type": "numeric",
+              "difficulty": "Medium",
+              "question": "If x is a positive integer and (x+1)!/(x-2)! = 80x, what is x? ",
+              "correctNumericAnswer": 9
+              "explanation": "",
+              "hints": [
+                ""
               ]
           }
         ] }, 
-        { "id": "permutations", "title": "2. Permutations", "questions": [] },
+        { "id": "permutations", "title": "2. Permutations", "questions": [
+          {
+            "id": "Comb-q1",
+              "type": "mcq",
+              "difficulty": "Medium",
+              "question": "How many ordered arrangements are there of letters a, b, c, d, and e? ",
+              "options" = ["20","60","120","240"],
+              "correctAnswer": 2
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q2",
+              "type": "mcq",
+              "difficulty": "Easy",
+              "question": "How many ways are there to order 3 apples, 2 bananas and 1 pear? ",
+              "options" = ["10","40","50","60"],
+              "correctAnswer": 3
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q3",
+              "type": "mcq",
+              "difficulty": "Easy",
+              "question": How many ordered arrangements are there of letters a, b, c, d, and e? ",
+              "options" = ["20","60","120","240"],
+              "correctAnswer": 2
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          },
+          {
+            "id": "Comb-q4",
+              "type": "numeric",
+              "difficulty": "Medium",
+              "question": "How many binary digits are there with 7 1s and 4 0s?",
+              "correctNumericAnswer": 330
+              "explanation": "",
+              "hints": [
+                ""
+              ]
+          }
+        ] },
         { "id": "Combinations", "title": "3. Combinations", "questions": [] },
         { "id": "basic-counting", "title": "4. Basic Counting", "questions": [] },
         { "id": "counting-circles-and-reflections", "title": "5. Counting for Circles and Reflections", "questions": [] },
