@@ -403,6 +403,32 @@
         </div>
       </div>
     </div>
+
+    <!-- 5. Quiz Results View -->
+    <div id="view-results" class="hidden space-y-6 max-w-lg mx-auto text-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+        <i data-lucide="award" class="w-8 h-8"></i>
+      </div>
+      <div class="space-y-2">
+        <h2 class="text-2xl font-extrabold text-slate-900">Practice Completed!</h2>
+        <p class="text-sm text-slate-500">Fantastic job working through these problems. Keep up the great streak!</p>
+      </div>
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-around">
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase">Questions</div>
+          <div id="results-total-q" class="text-xl font-bold text-slate-800">5</div>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase">XP Earned</div>
+          <div id="results-xp-earned" class="text-xl font-bold text-emerald-600">+50</div>
+        </div>
+      </div>
+      <div class="pt-2 flex gap-3 justify-center">
+        <button onclick="showDashboard()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition text-sm shadow-md">
+          Back to Home
+        </button>
+      </div>
+    </div>
   </main>
 
   <!-- Auth Modal -->
@@ -459,6 +485,7 @@
     let authMode = 'signin';
     let currentUser = null;
     let userStats = { xp: 0, streak: 0, displayName: '', bio: '', avatarUrl: '' };
+    let sessionXpEarned = 0;
     let canvas, ctx, isDrawing = false;
     let activeParentTopicId = null;
 
@@ -482,6 +509,7 @@
       document.getElementById('view-topic-overview').classList.add('hidden');
       document.getElementById('view-quiz').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
+      document.getElementById('view-results').classList.add('hidden');
     }
 
     function showDashboard() {
@@ -758,6 +786,7 @@
       activeQuestions = [];
       let displayTitle = "Practice";
       activeParentTopicId = null;
+      sessionXpEarned = 0;
 
       quizData.topics.forEach(t => {
         if (t.id === targetId) {
@@ -946,6 +975,7 @@
 
       if (isCorrect) {
         userStats.xp = (userStats.xp || 0) + 10;
+        sessionXpEarned += 10;
         updateStatsDisplay();
 
         if (currentUser && window.fbMethods) {
@@ -953,10 +983,6 @@
             const docRef = window.fbMethods.doc(window.firebaseDb, "users", currentUser.uid);
             await window.fbMethods.updateDoc(docRef, { xp: window.fbMethods.increment(10) });
           } catch(e){}
-        }
-
-        if (typeof confetti === 'function') {
-          confetti({ particleCount: 65, spread: 65, origin: { y: 0.8 } });
         }
 
         feedbackBox.className = "p-6 border-t border-emerald-200 bg-emerald-50 rounded-b-2xl space-y-4";
@@ -975,26 +1001,18 @@
           </div>
         `;
       } else {
-        const expectedSolution = q.type === 'numeric' 
-          ? `Correct Numerical Solution: <strong class="font-bold underline">${q.correctNumericAnswer}</strong>`
-          : `Correct Option: <strong class="font-bold">${String.fromCharCode(65 + q.correctAnswer)}) ${q.options[q.correctAnswer]}</strong>`;
-
-        feedbackBox.className = "p-6 border-t border-rose-200 bg-rose-50 rounded-b-2xl space-y-4";
+        feedbackBox.className = "p-6 border-t border-amber-200 bg-amber-50 rounded-b-2xl space-y-3";
         feedbackBox.innerHTML = `
           <div class="flex items-start gap-3">
-            <div class="p-2 bg-rose-500 text-white rounded-full shrink-0"><i data-lucide="x" class="w-5 h-5"></i></div>
+            <div class="p-2 bg-amber-500 text-white rounded-full shrink-0"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
             <div>
-              <h3 class="text-lg font-bold text-rose-900">Not quite yet</h3>
-              <p class="text-xs text-rose-800 font-semibold mt-0.5">${expectedSolution}</p>
-              <p class="text-sm text-rose-700 mt-2">${q.explanation || 'Review the hints or try again.'}</p>
+              <h3 class="text-base font-bold text-amber-900">Not quite right. Give it another try!</h3>
+              <p class="text-xs text-amber-700 mt-0.5">Check your calculations or review the hints if you need a little nudge.</p>
             </div>
           </div>
-          <div class="flex justify-end gap-3">
-            <button onclick="loadQuestion()" class="bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-5 py-2.5 rounded-xl font-bold transition">
+          <div class="flex justify-end">
+            <button onclick="hideFeedbackAndTryAgain()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition">
               Try Again
-            </button>
-            <button onclick="nextQuestion()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
-              Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
         `;
@@ -1002,17 +1020,25 @@
       lucide.createIcons();
     }
 
+    function hideFeedbackAndTryAgain() {
+      document.getElementById('feedback-box').classList.add('hidden');
+      document.getElementById('action-bar').classList.remove('hidden');
+    }
+
     function nextQuestion() {
       if (currentQuestionIndex < activeQuestions.length - 1) {
         currentQuestionIndex++;
         loadQuestion();
       } else {
-        if (activeParentTopicId) {
-          navigateToTopic(activeParentTopicId);
-        } else {
-          showDashboard();
+        hideAllViews();
+        document.getElementById('view-results').classList.remove('hidden');
+        document.getElementById('results-total-q').innerText = activeQuestions.length;
+        document.getElementById('results-xp-earned').innerText = `+${sessionXpEarned}`;
+        
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
         }
-        alert("🎉 Practice Completed!");
+        lucide.createIcons();
       }
     }
 
