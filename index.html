@@ -482,6 +482,7 @@
     let selectedOption = null;
     let userNumericAnswer = "";
     let hintsRevealed = 0;
+    let questionAttempts = 0; // Tracks retry attempts per question (max 1 retry)
     let authMode = 'signin';
     let currentUser = null;
     let userStats = { xp: 0, streak: 0, displayName: '', bio: '', avatarUrl: '' };
@@ -833,6 +834,7 @@
       selectedOption = null;
       userNumericAnswer = "";
       hintsRevealed = 0;
+      questionAttempts = 0; // Reset retry counter for new question
 
       document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
       document.getElementById('question-text').innerText = q.question;
@@ -1001,21 +1003,47 @@
           </div>
         `;
       } else {
-        feedbackBox.className = "p-6 border-t border-amber-200 bg-amber-50 rounded-b-2xl space-y-3";
-        feedbackBox.innerHTML = `
-          <div class="flex items-start gap-3">
-            <div class="p-2 bg-amber-500 text-white rounded-full shrink-0"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
-            <div>
-              <h3 class="text-base font-bold text-amber-900">Not quite right. Give it another try!</h3>
-              <p class="text-xs text-amber-700 mt-0.5">Check your calculations or review the hints if you need a little nudge.</p>
+        // If questionAttempts is 0, give ONE try again chance. If already 1, exhaust tries and show correct answer.
+        if (questionAttempts === 0) {
+          questionAttempts = 1;
+          feedbackBox.className = "p-6 border-t border-amber-200 bg-amber-50 rounded-b-2xl space-y-3";
+          feedbackBox.innerHTML = `
+            <div class="flex items-start gap-3">
+              <div class="p-2 bg-amber-500 text-white rounded-full shrink-0"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
+              <div>
+                <h3 class="text-base font-bold text-amber-900">Not quite right. You have 1 try remaining!</h3>
+                <p class="text-xs text-amber-700 mt-0.5">Check your calculations or review the hints if you need a nudge.</p>
+              </div>
             </div>
-          </div>
-          <div class="flex justify-end">
-            <button onclick="hideFeedbackAndTryAgain()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition">
-              Try Again
-            </button>
-          </div>
-        `;
+            <div class="flex justify-end">
+              <button onclick="hideFeedbackAndTryAgain()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition">
+                Try Again
+              </button>
+            </div>
+          `;
+        } else {
+          // Exhausted the 1 retry attempt, show correct solution and continue button
+          const expectedSolution = q.type === 'numeric' 
+            ? `Correct Numerical Solution: <strong class="font-bold underline">${q.correctNumericAnswer}</strong>`
+            : `Correct Option: <strong class="font-bold">${String.fromCharCode(65 + q.correctAnswer)}) ${q.options[q.correctAnswer]}</strong>`;
+
+          feedbackBox.className = "p-6 border-t border-rose-200 bg-rose-50 rounded-b-2xl space-y-4";
+          feedbackBox.innerHTML = `
+            <div class="flex items-start gap-3">
+              <div class="p-2 bg-rose-500 text-white rounded-full shrink-0"><i data-lucide="x" class="w-5 h-5"></i></div>
+              <div>
+                <h3 class="text-lg font-bold text-rose-900">Incorrect</h3>
+                <p class="text-xs text-rose-800 font-semibold mt-0.5">${expectedSolution}</p>
+                <p class="text-sm text-rose-700 mt-2">${q.explanation || 'Review the explanation above.'}</p>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button onclick="nextQuestion()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+        }
       }
       lucide.createIcons();
     }
